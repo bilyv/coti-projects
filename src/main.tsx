@@ -4,7 +4,12 @@ import { ConvexReactClient } from "convex/react";
 import "./index.css";
 import App from "./App";
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+// Use production URL if available and we're in production mode, otherwise use the development URL
+const convexUrl = import.meta.env.PROD && import.meta.env.PROD_CONVEX_URL 
+  ? import.meta.env.PROD_CONVEX_URL 
+  : import.meta.env.VITE_CONVEX_URL;
+
+const convex = new ConvexReactClient(convexUrl as string);
 
 createRoot(document.getElementById("root")!).render(
   <ConvexAuthProvider client={convex}>
