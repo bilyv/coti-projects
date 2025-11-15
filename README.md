@@ -1,7 +1,6 @@
 # Coti Project Progress Tracker
   
-This is a project built with [Chef](https://chef.convex.dev) using [Convex](https://convex.dev) as its backend.
- You can find docs about Chef with useful information like how to deploy to production [here](https://docs.convex.dev/chef).
+This is a project developed with contributions from Ntwari K. Brian using [Convex](https://convex.dev) as its backend.
   
 This project is connected to the Convex deployment named [`famous-jellyfish-627`](https://dashboard.convex.dev/d/famous-jellyfish-627).
   
