@@ -10,6 +10,7 @@ import { RegisterForm } from "./RegisterForm";
 
 export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -69,7 +70,42 @@ export default function App() {
                   </svg>
                 )}
               </button>
-              <SignOutButton />
+              
+              {/* Profile Button */}
+              <div className="relative">
+                <button 
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center gap-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                  aria-label="User profile"
+                >
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                    U
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                
+                {/* Profile Dropdown Menu */}
+                {showProfileMenu && (
+                  <div 
+                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-20"
+                    onMouseLeave={() => setShowProfileMenu(false)}
+                  >
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">User Menu</p>
+                    </div>
+                    <button className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                      Profile Settings
+                    </button>
+                    <button className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                      Account Settings
+                    </button>
+                    <div className="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <SignOutButton />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
