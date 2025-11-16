@@ -49,14 +49,14 @@ export function ProcessingPage({
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-100 text-center">
+      <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-100 text-center dark:bg-dark-800">
         {status === "processing" && (
           <div className="py-8">
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Creating your account</h3>
-            <p className="text-slate-600">Please wait while we set up your account...</p>
+            <h3 className="text-xl font-bold text-slate-800 mb-2 dark:text-slate-200">Creating your account</h3>
+            <p className="text-slate-600 dark:text-slate-400">Please wait while we set up your account...</p>
           </div>
         )}
 
@@ -67,8 +67,8 @@ export function ProcessingPage({
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Account Created!</h3>
-            <p className="text-slate-600 text-sm mb-6">
+            <h3 className="text-xl font-bold text-slate-800 mb-2 dark:text-slate-200">Account Created!</h3>
+            <p className="text-slate-600 text-sm mb-6 dark:text-slate-400">
               Welcome aboard, {name}! Your account has been successfully created.
             </p>
             <button
@@ -87,8 +87,8 @@ export function ProcessingPage({
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Account Creation Failed</h3>
-            <p className="text-slate-600 text-sm mb-4">
+            <h3 className="text-xl font-bold text-slate-800 mb-2 dark:text-slate-200">Account Creation Failed</h3>
+            <p className="text-slate-600 text-sm mb-4 dark:text-slate-400">
               {error}
             </p>
             <button

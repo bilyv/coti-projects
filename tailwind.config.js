@@ -13,6 +13,13 @@ export default {
           hover: '#2563eb',
         },
         secondary: '#64748b',
+        // Custom dark gray colors for dark mode
+        dark: {
+          900: '#111111',  // Almost black
+          800: '#1f1f1f',  // Dark gray
+          700: '#2d2d2d',  // Medium dark gray
+          600: '#3d3d3d',  // Light dark gray
+        }
       },
       spacing: {
         'section': '2rem',

@@ -24,6 +24,20 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const removeProject = useMutation(api.projects.remove);
 
+  // Convert hex color to rgba with higher opacity for more visible background
+  const getBackgroundColor = (hexColor: string) => {
+    // Remove # if present
+    const cleanHex = hexColor.replace('#', '');
+    
+    // Parse r, g, b values
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    
+    // Return rgba with higher opacity (increased from 0.05 to 0.15)
+    return `rgba(${r}, ${g}, ${b}, 0.15)`;
+  };
+
   const handleDelete = async () => {
     await removeProject({ projectId: project._id });
     setShowDeleteConfirm(false);
@@ -32,7 +46,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <>
       <div 
-        className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-100 hover:border-slate-200 group dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
+        className="rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-100 hover:border-slate-200 group dark:border-dark-700 dark:hover:border-dark-600"
+        style={{ 
+          backgroundColor: getBackgroundColor(project.color),
+        }}
         onClick={() => setShowModal(true)}
       >
         <div className="flex justify-between items-start mb-4">
@@ -77,7 +94,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
           
           <div 
-            className="w-4 h-4 rounded-full border-2 border-white shadow-sm dark:border-slate-800"
+            className="w-4 h-4 rounded-full border-2 border-white shadow-sm dark:border-dark-800"
             style={{ backgroundColor: project.color }}
           ></div>
         </div>
@@ -92,7 +109,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 dark:bg-black/70">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full dark:bg-slate-800">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full dark:bg-dark-800">
             <h3 className="text-lg font-semibold text-slate-800 mb-2 dark:text-slate-100">
               Delete Project
             </h3>
@@ -102,7 +119,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors dark:border-dark-700 dark:text-slate-300 dark:hover:bg-dark-700"
               >
                 Cancel
               </button>

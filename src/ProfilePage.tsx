@@ -41,14 +41,14 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 dark:bg-black/70">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto dark:bg-slate-800">
+      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto dark:bg-dark-800">
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+        <div className="p-6 border-b border-slate-200 dark:border-dark-700">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Profile</h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors dark:hover:bg-slate-700"
+              className="p-2 hover:bg-slate-100 rounded-lg transition-colors dark:hover:bg-dark-700"
             >
               <svg className="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -105,7 +105,7 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
             <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">
               Activity Overview
             </h4>
-            <div className="bg-slate-50 rounded-xl p-4 dark:bg-slate-700/50">
+            <div className="bg-slate-50 rounded-xl p-4 dark:bg-dark-700">
               <div className="flex items-end gap-1 h-32">
                 {weeks.map((week, weekIndex) => (
                   <div key={weekIndex} className="flex flex-col gap-1 flex-1 h-full">
@@ -155,7 +155,7 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
                   <span className="text-slate-700 dark:text-slate-300">Overall Progress</span>
                   <span className="text-slate-700 dark:text-slate-300">{completionRate}%</span>
                 </div>
-                <div className="w-full bg-slate-200 rounded-full h-2 dark:bg-slate-700">
+                <div className="w-full bg-slate-200 rounded-full h-2 dark:bg-dark-700">
                   <div
                     className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full"
                     style={{ width: `${completionRate}%` }}
@@ -164,7 +164,7 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-50 rounded-lg p-4 dark:bg-slate-700/50">
+                <div className="bg-slate-50 rounded-lg p-4 dark:bg-dark-700">
                   <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                     {totalProjects}
                   </div>
@@ -173,7 +173,7 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
                   </div>
                 </div>
                 
-                <div className="bg-slate-50 rounded-lg p-4 dark:bg-slate-700/50">
+                <div className="bg-slate-50 rounded-lg p-4 dark:bg-dark-700">
                   <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                     {totalSteps}
                   </div>
@@ -182,7 +182,7 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
                   </div>
                 </div>
                 
-                <div className="bg-slate-50 rounded-lg p-4 dark:bg-slate-700/50">
+                <div className="bg-slate-50 rounded-lg p-4 dark:bg-dark-700">
                   <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                     {completedSteps}
                   </div>

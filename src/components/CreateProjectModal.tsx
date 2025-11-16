@@ -20,7 +20,6 @@ const PROJECT_COLORS = [
 
 export function CreateProjectModal({ onClose }: CreateProjectModalProps) {
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,7 +33,6 @@ export function CreateProjectModal({ onClose }: CreateProjectModalProps) {
     try {
       await createProject({
         name: name.trim(),
-        description: description.trim() || undefined,
         color: selectedColor,
       });
       toast.success("Project created successfully!");
@@ -48,22 +46,22 @@ export function CreateProjectModal({ onClose }: CreateProjectModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 dark:bg-black/70">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto dark:bg-slate-800">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200">Create New Project</h2>
+      <div className="bg-white rounded-xl p-5 max-w-sm w-full dark:bg-dark-800 shadow-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200">New Project</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors dark:hover:bg-slate-700"
+            className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors dark:hover:bg-dark-700"
           >
-            <svg className="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2 dark:text-slate-300">
+            <label className="block text-xs font-medium text-slate-700 mb-1.5 dark:text-slate-300">
               Project Name
             </label>
             <input
@@ -71,59 +69,47 @@ export function CreateProjectModal({ onClose }: CreateProjectModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter project name"
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500"
+              className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2 dark:text-slate-300">
-              Description (optional)
+            <label className="block text-xs font-medium text-slate-700 mb-2 dark:text-slate-300">
+              Color
             </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of your project"
-              rows={3}
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-3 dark:text-slate-300">
-              Project Color
-            </label>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="flex gap-2">
               {PROJECT_COLORS.map((color) => (
                 <button
                   key={color}
                   type="button"
                   onClick={() => setSelectedColor(color)}
-                  className={`w-12 h-12 rounded-xl transition-all ${
+                  className={`w-8 h-8 rounded-lg transition-all ${
                     selectedColor === color
-                      ? "ring-2 ring-offset-2 ring-slate-400 scale-110 dark:ring-slate-500 dark:ring-offset-slate-800"
+                      ? "ring-2 ring-offset-1 ring-slate-400 dark:ring-slate-500"
                       : "hover:scale-105"
                   }`}
                   style={{ backgroundColor: color }}
+                  aria-label={`Select color ${color}`}
                 />
               ))}
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-2 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="flex-1 px-3 py-2.5 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors dark:border-dark-700 dark:text-slate-300 dark:hover:bg-dark-700"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!name.trim() || isSubmitting}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-3 py-2.5 text-sm bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Creating..." : "Create Project"}
+              {isSubmitting ? "Creating..." : "Create"}
             </button>
           </div>
         </form>

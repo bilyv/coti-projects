@@ -42,7 +42,7 @@ export function StepList({ steps, projectColor }: StepListProps) {
     return (
       <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-slate-50 rounded-xl p-4 animate-pulse dark:bg-slate-700">
+          <div key={i} className="bg-slate-50 rounded-xl p-4 animate-pulse dark:bg-dark-700">
             <div className="h-4 bg-slate-200 rounded w-3/4 mb-2 dark:bg-slate-600"></div>
             <div className="h-3 bg-slate-200 rounded w-1/2 dark:bg-slate-600"></div>
           </div>
@@ -54,7 +54,7 @@ export function StepList({ steps, projectColor }: StepListProps) {
   if (steps.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-slate-700">
+        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-dark-700">
           <svg className="w-8 h-8 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
           </svg>
@@ -74,8 +74,8 @@ export function StepList({ steps, projectColor }: StepListProps) {
             step.isUnlocked
               ? step.isCompleted
                 ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800/50"
-                : "bg-white border-slate-200 hover:border-slate-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
-              : "bg-slate-50 border-slate-200 opacity-60 dark:bg-slate-800/50 dark:border-slate-700"
+                : "bg-white border-slate-200 hover:border-slate-300 dark:bg-dark-800 dark:border-dark-700 dark:hover:border-dark-600"
+              : "bg-slate-50 border-slate-200 opacity-60 dark:bg-dark-800/50 dark:border-dark-700"
           }`}
         >
           <div className="p-4">

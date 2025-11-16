@@ -77,16 +77,16 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-100">
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-100 dark:bg-dark-800 dark:border-dark-700">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-slate-800">Create Account</h2>
-          <p className="text-slate-600 text-sm mt-1">Join us to get started</p>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Create Account</h2>
+          <p className="text-slate-600 text-sm mt-1 dark:text-slate-400">Join us to get started</p>
         </div>
 
         {step === 1 && (
           <form className="space-y-4" onSubmit={handleNameSubmit}>
             <div>
-              <label htmlFor="name" className="block text-xs font-medium text-slate-700 mb-1">
+              <label htmlFor="name" className="block text-xs font-medium text-slate-700 mb-1 dark:text-slate-300">
                 Full Name
               </label>
               <input
@@ -97,12 +97,12 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
                 onChange={(e) => setName(e.target.value)}
                 required
                 autoFocus
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 dark:bg-dark-800 dark:border-dark-700 dark:text-white"
                 placeholder="John Doe"
               />
             </div>
             
-            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {error && <p className="text-red-500 text-xs dark:text-red-400">{error}</p>}
             
             <button
               type="submit"
@@ -119,17 +119,17 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-slate-500 hover:text-slate-700"
+                className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
                 </svg>
               </button>
-              <h3 className="text-lg font-medium text-slate-800 ml-2">What's your email?</h3>
+              <h3 className="text-lg font-medium text-slate-800 ml-2 dark:text-slate-200">What's your email?</h3>
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-xs font-medium text-slate-700 mb-1">
+              <label htmlFor="email" className="block text-xs font-medium text-slate-700 mb-1 dark:text-slate-300">
                 Email
               </label>
               <input
@@ -140,12 +140,12 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoFocus
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 dark:bg-dark-800 dark:border-dark-700 dark:text-white"
                 placeholder="you@example.com"
               />
             </div>
             
-            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {error && <p className="text-red-500 text-xs dark:text-red-400">{error}</p>}
             
             <button
               type="submit"
@@ -162,17 +162,17 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="text-slate-500 hover:text-slate-700"
+                className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
                 </svg>
               </button>
-              <h3 className="text-lg font-medium text-slate-800 ml-2">Create password</h3>
+              <h3 className="text-lg font-medium text-slate-800 ml-2 dark:text-slate-200">Create password</h3>
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-xs font-medium text-slate-700 mb-1">
+              <label htmlFor="password" className="block text-xs font-medium text-slate-700 mb-1 dark:text-slate-300">
                 Password
               </label>
               <input
@@ -184,13 +184,13 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
                 required
                 minLength={8}
                 autoFocus
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 dark:bg-dark-800 dark:border-dark-700 dark:text-white"
                 placeholder="••••••••"
               />
             </div>
             
             <div>
-              <label htmlFor="confirmPassword" className="block text-xs font-medium text-slate-700 mb-1">
+              <label htmlFor="confirmPassword" className="block text-xs font-medium text-slate-700 mb-1 dark:text-slate-300">
                 Confirm Password
               </label>
               <input
@@ -200,16 +200,16 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 dark:bg-dark-800 dark:border-dark-700 dark:text-white"
                 placeholder="••••••••"
               />
             </div>
             
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Password must be at least 8 characters long
             </p>
             
-            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {error && <p className="text-red-500 text-xs dark:text-red-400">{error}</p>}
             
             <button
               type="submit"
@@ -222,12 +222,12 @@ export function RegisterForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => voi
 
         {step < 4 && (
           <div className="mt-6 text-center">
-            <p className="text-slate-600 text-sm">
+            <p className="text-slate-600 text-sm dark:text-slate-400">
               Already have an account?{" "}
               <button
                 type="button"
                 onClick={onSwitchToSignIn}
-                className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                className="text-blue-600 hover:text-blue-700 font-medium hover:underline dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Sign in
               </button>

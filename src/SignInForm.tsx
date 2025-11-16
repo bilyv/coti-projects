@@ -9,10 +9,10 @@ export function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void 
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-100">
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-100 dark:bg-dark-800 dark:border-dark-700">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-slate-800">Welcome Back</h2>
-          <p className="text-slate-600 text-sm mt-1">Sign in to continue</p>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Welcome Back</h2>
+          <p className="text-slate-600 text-sm mt-1 dark:text-slate-400">Sign in to continue</p>
         </div>
 
         <form
@@ -35,7 +35,7 @@ export function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void 
           }}
         >
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-slate-700 mb-1">
+            <label htmlFor="email" className="block text-xs font-medium text-slate-700 mb-1 dark:text-slate-300">
               Email
             </label>
             <input
@@ -43,13 +43,13 @@ export function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void 
               name="email"
               type="email"
               required
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 dark:bg-dark-800 dark:border-dark-700 dark:text-white"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-slate-700 mb-1">
+            <label htmlFor="password" className="block text-xs font-medium text-slate-700 mb-1 dark:text-slate-300">
               Password
             </label>
             <input
@@ -57,7 +57,7 @@ export function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void 
               name="password"
               type="password"
               required
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 dark:bg-dark-800 dark:border-dark-700 dark:text-white"
               placeholder="••••••••"
             />
           </div>
@@ -72,12 +72,12 @@ export function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void 
         </form>
 
         <div className="mt-4 text-center">
-          <p className="text-slate-600 text-sm">
+          <p className="text-slate-600 text-sm dark:text-slate-400">
             New here?{" "}
             <button
               type="button"
               onClick={onSwitchToSignUp}
-              className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+              className="text-blue-600 hover:text-blue-700 font-medium hover:underline dark:text-blue-400 dark:hover:text-blue-300"
             >
               Create an account
             </button>
