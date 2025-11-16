@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
-import { ProjectModal } from "./ProjectModal";
 import { ProgressCircle } from "./ProgressCircle";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -20,7 +20,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const removeProject = useMutation(api.projects.remove);
 
@@ -50,7 +50,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         style={{ 
           backgroundColor: getBackgroundColor(project.color),
         }}
-        onClick={() => setShowModal(true)}
+        onClick={() => navigate(`/project/${project._id}`)}
       >
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
@@ -93,19 +93,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
             </div>
           </div>
           
-          <div 
-            className="w-4 h-4 rounded-full border-2 border-white shadow-sm dark:border-dark-800"
-            style={{ backgroundColor: project.color }}
-          ></div>
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/50 dark:bg-dark-700/50 group-hover:bg-white dark:group-hover:bg-dark-600 transition-colors">
+            <svg className="w-4 h-4 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </div>
       </div>
-
-      {showModal && (
-        <ProjectModal 
-          project={project} 
-          onClose={() => setShowModal(false)} 
-        />
-      )}
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 dark:bg-black/70">

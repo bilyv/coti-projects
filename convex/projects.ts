@@ -38,6 +38,36 @@ export const list = query({
   },
 });
 
+export const get = query({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project || project.userId !== userId) {
+      return null;
+    }
+
+    // Get step counts and completion for the project
+    const steps = await ctx.db
+      .query("steps")
+      .withIndex("by_project", (q) => q.eq("projectId", project._id))
+      .collect();
+    
+    const totalSteps = steps.length;
+    const completedSteps = steps.filter(step => step.isCompleted).length;
+    const progress = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+
+    return {
+      ...project,
+      totalSteps,
+      completedSteps,
+      progress: Math.round(progress),
+    };
+  },
+});
+
 export const create = mutation({
   args: {
     name: v.string(),
