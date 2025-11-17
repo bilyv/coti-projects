@@ -18,6 +18,7 @@ import type * as http from "../http.js";
 import type * as projects from "../projects.js";
 import type * as router from "../router.js";
 import type * as steps from "../steps.js";
+import type * as subtasks from "../subtasks.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   projects: typeof projects;
   router: typeof router;
   steps: typeof steps;
+  subtasks: typeof subtasks;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

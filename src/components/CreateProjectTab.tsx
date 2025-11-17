@@ -15,23 +15,30 @@ const PROJECT_COLORS = [
   "#84cc16", // lime
 ];
 
+interface Subtask {
+  title: string;
+  isCompleted: boolean;
+}
+
 interface Step {
   title: string;
   description: string;
+  subtasks: Subtask[];
 }
 
 export function CreateProjectTab() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [link, setLink] = useState("");
   const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
-  const [steps, setSteps] = useState<Step[]>([{ title: "", description: "" }]);
+  const [steps, setSteps] = useState<Step[]>([{ title: "", description: "", subtasks: [] }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const createProject = useMutation(api.projects.create);
     const createStep = useMutation(api.steps.create);
 
   const handleAddStep = () => {
-    setSteps([...steps, { title: "", description: "" }]);
+    setSteps([...steps, { title: "", description: "", subtasks: [] }]);
   };
 
   const handleRemoveStep = (index: number) => {
@@ -43,7 +50,29 @@ export function CreateProjectTab() {
 
   const handleStepChange = (index: number, field: keyof Step, value: string) => {
     const newSteps = [...steps];
-    newSteps[index][field] = value;
+    if (field === 'subtasks') {
+      // This shouldn't happen with our current implementation
+      return;
+    }
+    (newSteps[index][field] as string) = value;
+    setSteps(newSteps);
+  };
+
+  const handleSubtaskChange = (stepIndex: number, subtaskIndex: number, value: string) => {
+    const newSteps = [...steps];
+    newSteps[stepIndex].subtasks[subtaskIndex].title = value;
+    setSteps(newSteps);
+  };
+
+  const handleAddSubtask = (stepIndex: number) => {
+    const newSteps = [...steps];
+    newSteps[stepIndex].subtasks.push({ title: "", isCompleted: false });
+    setSteps(newSteps);
+  };
+
+  const handleRemoveSubtask = (stepIndex: number, subtaskIndex: number) => {
+    const newSteps = [...steps];
+    newSteps[stepIndex].subtasks.splice(subtaskIndex, 1);
     setSteps(newSteps);
   };
 
@@ -57,10 +86,12 @@ export function CreateProjectTab() {
       const projectId: Id<"projects"> = await createProject({
         name: name.trim(),
         description: description.trim() || undefined,
+        link: link.trim() || undefined,
         color: selectedColor,
       });
 
       // Then create steps if any
+      // Note: Subtasks will be created separately when editing steps after project creation
       if (steps.some(step => step.title.trim())) {
         for (const step of steps) {
           if (step.title.trim()) {
@@ -77,8 +108,9 @@ export function CreateProjectTab() {
       // Reset form
       setName("");
       setDescription("");
+      setLink("");
       setSelectedColor(PROJECT_COLORS[0]);
-      setSteps([{ title: "", description: "" }]);
+      setSteps([{ title: "", description: "", subtasks: [] }]);
     } catch (error) {
       toast.error("Failed to create project");
       console.error("Error creating project:", error);
@@ -144,6 +176,20 @@ export function CreateProjectTab() {
           />
         </div>
 
+        {/* Project Link */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5 dark:text-slate-300">
+            Project Link (optional)
+          </label>
+          <input
+            type="url"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            placeholder="https://example.com"
+            className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
+          />
+        </div>
+
         {/* Steps Section */}
         <div className="border-t border-slate-200 dark:border-dark-700 pt-6">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Steps</h3>
@@ -193,6 +239,45 @@ export function CreateProjectTab() {
                       rows={2}
                       className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
                     />
+                  </div>
+                  
+                  {/* Subtasks Section */}
+                  <div className="border-t border-slate-200 dark:border-dark-700 pt-3 mt-2">
+                    <div className="flex justify-between items-center mb-2">
+                      <h5 className="text-xs font-medium text-slate-600 dark:text-slate-400">Subtasks</h5>
+                      <button
+                        type="button"
+                        onClick={() => handleAddSubtask(index)}
+                        className="text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
+                        + Add Subtask
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      {step.subtasks.map((subtask, subtaskIndex) => (
+                        <div key={subtaskIndex} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={subtask.title}
+                            onChange={(e) => handleSubtaskChange(index, subtaskIndex, e.target.value)}
+                            placeholder="Enter subtask"
+                            className="flex-1 px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
+                          />
+                          {step.subtasks.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveSubtask(index, subtaskIndex)}
+                              className="text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

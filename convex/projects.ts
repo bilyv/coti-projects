@@ -72,6 +72,7 @@ export const create = mutation({
   args: {
     name: v.string(),
     description: v.optional(v.string()),
+    link: v.optional(v.string()),
     color: v.string(),
   },
   handler: async (ctx, args) => {
@@ -81,6 +82,7 @@ export const create = mutation({
     return await ctx.db.insert("projects", {
       name: args.name,
       description: args.description,
+      link: args.link,
       userId,
       color: args.color,
     });
@@ -92,6 +94,7 @@ export const update = mutation({
     projectId: v.id("projects"),
     name: v.optional(v.string()),
     description: v.optional(v.string()),
+    link: v.optional(v.string()),
     color: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -106,6 +109,7 @@ export const update = mutation({
     const updatedFields: any = {};
     if (args.name !== undefined) updatedFields.name = args.name;
     if (args.description !== undefined) updatedFields.description = args.description;
+    if (args.link !== undefined) updatedFields.link = args.link;
     if (args.color !== undefined) updatedFields.color = args.color;
 
     return await ctx.db.patch(args.projectId, updatedFields);

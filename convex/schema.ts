@@ -6,6 +6,7 @@ const applicationTables = {
   projects: defineTable({
     name: v.string(),
     description: v.optional(v.string()),
+    link: v.optional(v.string()),
     userId: v.id("users"),
     color: v.string(),
   }).index("by_user", ["userId"]),
@@ -19,6 +20,14 @@ const applicationTables = {
     isUnlocked: v.boolean(),
   }).index("by_project", ["projectId"])
     .index("by_project_and_order", ["projectId", "order"]),
+    
+  subtasks: defineTable({
+    stepId: v.id("steps"),
+    title: v.string(),
+    isCompleted: v.boolean(),
+    order: v.number(),
+  }).index("by_step", ["stepId"])
+    .index("by_step_and_order", ["stepId", "order"]),
 };
 
 export default defineSchema({
