@@ -117,7 +117,7 @@ export default function App() {
         </header>
       </Authenticated>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8 pb-20 md:pb-8">
         <Content />
       </main>
       
@@ -174,7 +174,7 @@ function Content() {
       <Authenticated>
         <div className="flex flex-col md:flex-row gap-6">
           {/* Beautiful Sidebar */}
-          <div className="md:fixed md:left-0 md:top-20 md:bottom-0 md:w-64 bg-white dark:bg-dark-800 rounded-xl md:rounded-none md:shadow-none border border-slate-200 dark:border-dark-700 md:border-0 p-4 md:p-6 h-fit md:h-[calc(100vh-5rem)] overflow-y-auto">
+          <div className="hidden md:block md:fixed md:left-0 md:top-20 md:bottom-0 md:w-64 bg-white dark:bg-dark-800 rounded-xl md:rounded-none md:shadow-none border border-slate-200 dark:border-dark-700 md:border-0 p-4 md:p-6 h-fit md:h-[calc(100vh-5rem)] overflow-y-auto">
             <div className="space-y-1">
               <button
                 onClick={() => setActiveTab('overview')}
@@ -262,7 +262,7 @@ function Content() {
           </div>
           
           {/* Main Content Area */}
-          <div className="md:ml-64 flex-1 w-full">
+          <div className="md:ml-64 flex-1 w-full mt-4 md:mt-0">
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">

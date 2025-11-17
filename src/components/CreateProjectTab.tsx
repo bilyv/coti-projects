@@ -140,7 +140,7 @@ export function CreateProjectTab() {
   };
 
   return (
-    <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
+    <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 mb-6 md:mb-0">
       <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Create New Project</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
