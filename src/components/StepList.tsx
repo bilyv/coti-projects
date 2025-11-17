@@ -1,7 +1,14 @@
-import { useMutation } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
+
+interface Subtask {
+  _id: Id<"subtasks">;
+  title: string;
+  isCompleted: boolean;
+  order: number;
+}
 
 interface Step {
   _id: Id<"steps">;
@@ -15,6 +22,55 @@ interface Step {
 interface StepListProps {
   steps: Step[] | undefined;
   projectColor: string;
+}
+
+// SubtaskList component to handle subtasks for each step
+function SubtaskList({ stepId }: { stepId: Id<"steps"> }) {
+  const subtasks = useQuery(api.subtasks.listByStep, { stepId }) || [];
+  const toggleSubtaskComplete = useMutation(api.subtasks.toggleComplete);
+
+  const handleToggleSubtaskComplete = async (subtaskId: Id<"subtasks">) => {
+    try {
+      await toggleSubtaskComplete({ subtaskId });
+    } catch (error) {
+      toast.error("Failed to update subtask");
+    }
+  };
+
+  if (!subtasks || subtasks.length === 0) return null;
+
+  return (
+    <div className="mt-3 pl-4 border-l-2 border-slate-200 dark:border-dark-600">
+      <h5 className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">Subtasks</h5>
+      <div className="space-y-2">
+        {subtasks.map((subtask) => (
+          <div key={subtask._id} className="flex items-center gap-2">
+            <button
+              onClick={() => handleToggleSubtaskComplete(subtask._id)}
+              className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center ${
+                subtask.isCompleted
+                  ? "bg-green-500 border-green-500"
+                  : "border-slate-300 dark:border-slate-600"
+              }`}
+            >
+              {subtask.isCompleted && (
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+            <span className={`text-sm ${
+              subtask.isCompleted
+                ? "text-green-700 line-through dark:text-green-400"
+                : "text-slate-700 dark:text-slate-300"
+            }`}>
+              {subtask.title}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function StepList({ steps, projectColor }: StepListProps) {
@@ -132,6 +188,9 @@ export function StepList({ steps, projectColor }: StepListProps) {
                     {step.description}
                   </p>
                 )}
+
+                {/* Subtasks Section */}
+                <SubtaskList stepId={step._id} />
               </div>
 
               {/* Actions */}

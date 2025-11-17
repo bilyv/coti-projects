@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
@@ -35,7 +35,8 @@ export function CreateProjectTab() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const createProject = useMutation(api.projects.create);
-    const createStep = useMutation(api.steps.create);
+  const createStep = useMutation(api.steps.create);
+  const createSubtask = useMutation(api.subtasks.create);
 
   const handleAddStep = () => {
     setSteps([...steps, { title: "", description: "", subtasks: [] }]);
@@ -76,6 +77,15 @@ export function CreateProjectTab() {
     setSteps(newSteps);
   };
 
+  // Add automatic saving for subtasks
+  const autoSaveSubtask = (stepIndex: number, subtaskIndex: number, value: string) => {
+    // Update the subtask title in state
+    handleSubtaskChange(stepIndex, subtaskIndex, value);
+    
+    // In the project creation form, we don't save to the backend yet
+    // The subtasks will be saved when the project is submitted
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -90,16 +100,26 @@ export function CreateProjectTab() {
         color: selectedColor,
       });
 
-      // Then create steps if any
-      // Note: Subtasks will be created separately when editing steps after project creation
+      // Then create steps and their subtasks
       if (steps.some(step => step.title.trim())) {
         for (const step of steps) {
           if (step.title.trim()) {
-            createStep({
+            // Create the step
+            const stepId = await createStep({
               projectId,
               title: step.title.trim(),
               description: step.description.trim() || undefined,
             });
+
+            // Create subtasks for this step
+            for (const subtask of step.subtasks) {
+              if (subtask.title.trim()) {
+                await createSubtask({
+                  stepId,
+                  title: subtask.title.trim(),
+                });
+              }
+            }
           }
         }
       }
@@ -260,7 +280,7 @@ export function CreateProjectTab() {
                           <input
                             type="text"
                             value={subtask.title}
-                            onChange={(e) => handleSubtaskChange(index, subtaskIndex, e.target.value)}
+                            onChange={(e) => autoSaveSubtask(index, subtaskIndex, e.target.value)}
                             placeholder="Enter subtask"
                             className="flex-1 px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
                           />
