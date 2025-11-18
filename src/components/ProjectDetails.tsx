@@ -23,6 +23,7 @@ export function ProjectDetails() {
   const [showCreateStep, setShowCreateStep] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [description, setDescription] = useState("");
+  const [showFullDescription, setShowFullDescription] = useState(false);
   
   const project = useQuery(api.projects.get, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   const steps = useQuery(api.steps.listByProject, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
@@ -84,6 +85,48 @@ export function ProjectDetails() {
     }
   };
 
+  // Truncate description for preview
+  const truncateDescription = (text: string, maxLength: number = 200) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
+  const renderDescription = () => {
+    if (!project.description) {
+      return (
+        <div className="flex items-start gap-3">
+          <div className="mt-1 text-slate-400 dark:text-slate-500">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-slate-500 dark:text-slate-400 italic">No description added yet</p>
+          </div>
+        </div>
+      );
+    }
+
+    const isLongDescription = project.description.length > 200;
+    const shouldTruncate = isLongDescription && !showFullDescription;
+
+    return (
+      <div className="mt-2">
+        <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">
+          {shouldTruncate ? truncateDescription(project.description) : project.description}
+        </p>
+        {isLongDescription && (
+          <button
+            onClick={() => setShowFullDescription(!showFullDescription)}
+            className="mt-2 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+          >
+            {showFullDescription ? "Show Less" : "Read More"}
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-900 dark:to-dark-800 pb-20 md:pb-8">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -138,24 +181,17 @@ export function ProjectDetails() {
                   </div>
                 </div>
               ) : (
-                <div className="mt-2">
-                  {project.description ? (
-                    <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{project.description}</p>
-                  ) : (
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1 text-slate-400 dark:text-slate-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-slate-500 dark:text-slate-400 italic">No description added yet</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                renderDescription()
               )}
             </div>
+            <button
+              onClick={() => setIsEditingDescription(true)}
+              className="p-2 rounded-lg hover:bg-slate-100 transition-colors dark:hover:bg-dark-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500 dark:text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </button>
           </div>
 
           <div className="flex items-center justify-between">

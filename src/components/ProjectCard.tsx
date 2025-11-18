@@ -38,6 +38,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
     return `rgba(${r}, ${g}, ${b}, 0.15)`;
   };
 
+  // Truncate description for preview
+  const truncateDescription = (text: string, maxLength: number = 100) => {
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
   const handleDelete = async () => {
     await removeProject({ projectId: project._id });
     setShowDeleteConfirm(false);
@@ -58,8 +65,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
               {project.name}
             </h3>
             {project.description && (
-              <p className="text-slate-600 text-sm line-clamp-2 dark:text-slate-400">
-                {project.description}
+              <p className="text-slate-600 text-sm dark:text-slate-400" title={project.description}>
+                {truncateDescription(project.description, 100)}
               </p>
             )}
           </div>
