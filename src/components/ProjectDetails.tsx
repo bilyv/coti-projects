@@ -17,17 +17,6 @@ interface Project {
   progress: number;
 }
 
-const PROJECT_COLORS = [
-  "#3b82f6", // blue
-  "#8b5cf6", // purple
-  "#06b6d4", // cyan
-  "#10b981", // emerald
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#ec4899", // pink
-  "#84cc16", // lime
-];
-
 export function ProjectDetails() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
@@ -36,12 +25,10 @@ export function ProjectDetails() {
   const [description, setDescription] = useState("");
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
-  const [isEditingProject, setIsEditingProject] = useState(false);
   
   const project = useQuery(api.projects.get, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   const steps = useQuery(api.steps.listByProject, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   const updateProject = useMutation(api.projects.update);
-  const removeProject = useMutation(api.projects.remove);
 
   // If projectId is invalid or project doesn't exist, redirect to home
   useEffect(() => {
@@ -149,26 +136,6 @@ export function ProjectDetails() {
     );
   };
 
-  const handleProjectUpdate = async (e: React.FormEvent, updatedProject: any) => {
-    e.preventDefault();
-    if (projectId) {
-      await updateProject({
-        projectId: projectId as Id<"projects">,
-        name: updatedProject.name,
-        description: updatedProject.description || undefined,
-        color: updatedProject.color,
-      });
-      setIsEditingProject(false);
-    }
-  };
-
-  const handleProjectDelete = async () => {
-    if (projectId) {
-      await removeProject({ projectId: projectId as Id<"projects"> });
-      navigate("/");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-900 dark:to-dark-800 pb-20 md:pb-8">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -183,6 +150,16 @@ export function ProjectDetails() {
             </svg>
             <span>Back to Projects</span>
           </button>
+          {/* Edit Project Button */}
+          <button
+            onClick={() => navigate(`/edit-project/${projectId}`)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            <span>Edit Project</span>
+          </button>
         </div>
 
         {/* Project Header */}
@@ -190,17 +167,42 @@ export function ProjectDetails() {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">{project.name}</h1>
-              {renderDescription()}
+              {isEditingDescription ? (
+                <div className="mt-4">
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Add project description..."
+                    className="w-full p-4 border border-slate-300 rounded-xl dark:bg-dark-700 dark:border-dark-600 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    rows={4}
+                  />
+                  <div className="flex gap-3 mt-3">
+                    <button
+                      onClick={handleDescriptionSave}
+                      disabled={!description.trim()}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                        description.trim()
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
+                          : "bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-dark-600 dark:text-slate-400"
+                      }`}
+                    >
+                      Save Description
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDescription(project.description || "");
+                        setIsEditingDescription(false);
+                      }}
+                      className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-all dark:bg-dark-700 dark:text-slate-300 dark:hover:bg-dark-600"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                renderDescription()
+              )}
             </div>
-            {/* Edit pencil button for entire project */}
-            <button
-              onClick={() => setIsEditingProject(true)}
-              className="p-2 rounded-lg hover:bg-slate-100 transition-colors dark:hover:bg-dark-700"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500 dark:text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
-            </button>
           </div>
 
           <div className="flex items-center justify-between">
@@ -292,122 +294,6 @@ export function ProjectDetails() {
               >
                 Close
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Project Modal */}
-      {isEditingProject && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 dark:bg-black/70">
-          <div className="bg-white rounded-2xl max-w-md w-full dark:bg-dark-800 shadow-lg">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Edit Project</h2>
-                <button
-                  onClick={() => setIsEditingProject(false)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors dark:hover:bg-dark-700"
-                >
-                  <svg className="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target as HTMLFormElement);
-                handleProjectUpdate(e, {
-                  name: formData.get('name') as string,
-                  description: formData.get('description') as string,
-                  color: formData.get('color') as string,
-                });
-              }} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">
-                    Project Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    defaultValue={project.name}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    defaultValue={project.description || ''}
-                    placeholder="Add project description..."
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">
-                    Color
-                  </label>
-                  <div className="flex gap-2">
-                    {PROJECT_COLORS.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={(e) => {
-                          const form = e.currentTarget.closest('form');
-                          if (form) {
-                            const colorInput = form.querySelector('input[name="color"]') as HTMLInputElement;
-                            if (colorInput) {
-                              colorInput.value = color;
-                            }
-                          }
-                        }}
-                        className={`w-8 h-8 rounded-lg transition-all ${
-                          project.color === color
-                            ? "ring-2 ring-offset-1 ring-slate-400 dark:ring-slate-500"
-                            : "hover:scale-105"
-                        }`}
-                        style={{ backgroundColor: color }}
-                        aria-label={`Select color ${color}`}
-                      />
-                    ))}
-                    <input type="hidden" name="color" value={project.color} />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingProject(false)}
-                    className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors dark:border-dark-700 dark:text-slate-300 dark:hover:bg-dark-700"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-
-              <div className="border-t border-slate-200 dark:border-dark-700 mt-6 pt-6">
-                <button
-                  onClick={handleProjectDelete}
-                  className="w-full py-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium flex items-center justify-center gap-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Delete Project
-                </button>
-              </div>
             </div>
           </div>
         </div>

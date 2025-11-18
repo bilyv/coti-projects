@@ -6,6 +6,7 @@ import "./index.css";
 import App from "./App";
 // Using the components index file for cleaner imports
 import { ProjectDetails } from "./components";
+import { EditProjectForm } from "./components/EditProjectForm";
 
 // Use production URL if available and we're in production mode, otherwise use the development URL
 const convexUrl = import.meta.env.PROD && import.meta.env.PROD_CONVEX_URL 
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: "/project/:projectId",
     element: <ProjectDetails />,
+  },
+  {
+    path: "/edit-project/:projectId",
+    element: <EditProjectForm />,
   },
 ]);
 
