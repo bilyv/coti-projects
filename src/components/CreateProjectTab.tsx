@@ -36,6 +36,7 @@ export function CreateProjectTab() {
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [descriptionContent, setDescriptionContent] = useState("");
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
   const createProject = useMutation(api.projects.create);
@@ -43,16 +44,37 @@ export function CreateProjectTab() {
   const createSubtask = useMutation(api.subtasks.create);
 
   // Drag and drop handlers
-  const handleDragStart = (index: number) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
     setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    // Add a slight delay to prevent immediate drag
+    setTimeout(() => {
+      e.currentTarget.classList.add("opacity-50");
+    }, 0);
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
     e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDropTargetIndex(index);
   };
 
-  const handleDrop = (targetIndex: number) => {
-    if (draggedIndex === null || draggedIndex === targetIndex) return;
+  const handleDragLeave = () => {
+    setDropTargetIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDropTargetIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) {
+      setDraggedIndex(null);
+      setDropTargetIndex(null);
+      return;
+    }
     
     const newSteps = [...steps];
     const draggedStep = newSteps[draggedIndex];
@@ -64,6 +86,7 @@ export function CreateProjectTab() {
     
     setSteps(newSteps);
     setDraggedIndex(null);
+    setDropTargetIndex(null);
   };
 
   const handleAddStep = () => {
@@ -285,27 +308,37 @@ export function CreateProjectTab() {
         <div className="border-t border-slate-200 dark:border-dark-700 pt-4">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-3">Steps</h3>
           
-          <div className="space-y-3">
+          <div className="space-y-3 transition-all duration-300">
             {steps.map((step, index) => (
               <div 
                 key={index} 
-                className={`border border-slate-200 dark:border-dark-700 rounded-lg p-3 ${
-                  draggedIndex === index ? "bg-blue-50 dark:bg-blue-900/20" : ""
+                className={`border border-slate-200 dark:border-dark-700 rounded-lg p-3 transition-all duration-200 ease-in-out transform ${
+                  draggedIndex === index 
+                    ? "bg-blue-50 dark:bg-blue-900/20 opacity-50 scale-95 shadow-md" 
+                    : dropTargetIndex === index && draggedIndex !== null
+                    ? "bg-blue-100 dark:bg-blue-900/30 scale-105 shadow-lg"
+                    : "bg-white dark:bg-dark-800"
+                } ${
+                  dropTargetIndex === index && draggedIndex !== null 
+                    ? "ring-2 ring-blue-500 ring-opacity-50" 
+                    : ""
                 }`}
                 draggable
-                onDragStart={() => handleDragStart(index)}
-                onDragOver={handleDragOver}
-                onDrop={() => handleDrop(index)}
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDragEnd={handleDragEnd}
+                onDrop={(e) => handleDrop(e, index)}
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-2">
                     {/* Drag Handle */}
                     <div 
-                      className="cursor-move p-1 rounded hover:bg-slate-100 dark:hover:bg-dark-700"
+                      className="cursor-move p-1 rounded hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors"
                       draggable
                       onDragStart={(e) => {
                         e.stopPropagation();
-                        handleDragStart(index);
+                        handleDragStart(e, index);
                       }}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
