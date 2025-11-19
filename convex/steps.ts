@@ -131,6 +131,16 @@ export const remove = mutation({
       throw new Error("Unauthorized");
     }
 
+    // Delete all subtasks associated with this step first
+    const subtasks = await ctx.db
+      .query("subtasks")
+      .withIndex("by_step", (q) => q.eq("stepId", args.stepId))
+      .collect();
+    
+    for (const subtask of subtasks) {
+      await ctx.db.delete(subtask._id);
+    }
+
     // Get all steps in the project
     const allSteps = await ctx.db
       .query("steps")

@@ -127,14 +127,18 @@ export const remove = mutation({
       throw new Error("Project not found or unauthorized");
     }
 
-    // Delete all steps first
+    // Import the steps module to use its remove mutation
+    const stepsModule = await import("./steps");
+    
+    // Delete all steps (which will also delete their subtasks)
     const steps = await ctx.db
       .query("steps")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .collect();
     
     for (const step of steps) {
-      await ctx.db.delete(step._id);
+      // Call the steps.remove mutation for each step to ensure subtasks are deleted
+      await stepsModule.remove.handler(ctx, { stepId: step._id });
     }
 
     // Delete the project
