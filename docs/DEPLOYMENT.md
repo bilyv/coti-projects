@@ -67,6 +67,7 @@ Before deploying, ensure you have:
    ```bash
    npm install -g convex
    ```
+
 3. Authenticate with Convex:
    ```bash
    npx convex login
@@ -135,17 +136,36 @@ The application can be deployed to any static hosting platform that supports SPA
 ### Required Variables
 
 - `VITE_CONVEX_URL`: The URL of your Convex deployment
-- `CONVEX_DEPLOYMENT`: The name of your Convex deployment
-- `CONVEX_SITE_URL`: The URL where your application will be hosted
 
-### Example Configuration
+### Setting Up Environment Variables
 
-```bash
-# .env.production
-VITE_CONVEX_URL=https://your-app-123.convex.cloud
-CONVEX_DEPLOYMENT=your-app-123
-CONVEX_SITE_URL=https://your-domain.com
-```
+For production deployment, you should create a `.env.production` file with your actual Convex URL:
+
+1. Copy the example file:
+   ```bash
+   cp .env.production.example .env.production
+   ```
+
+2. Update the `.env.production` file with your actual Convex deployment URL:
+   ```bash
+   # .env.production
+   VITE_CONVEX_URL=https://your-actual-app-123.convex.cloud
+   ```
+
+**Important Security Note**: The `.env.production` file is excluded from version control via `.gitignore` to prevent accidental exposure of your deployment URLs. Never commit actual environment files containing sensitive information to your repository.
+
+### Platform-Specific Environment Variable Setup
+
+#### Convex Hosting
+When using `npx convex deploy`, Convex automatically sets the required environment variables.
+
+#### Cloudflare Pages
+Set environment variables in the Cloudflare Pages dashboard under your project settings:
+- Variable name: `VITE_CONVEX_URL`
+- Value: Your actual Convex deployment URL (e.g., https://your-app-123.convex.cloud)
+
+#### Other Platforms
+For other hosting platforms, set environment variables according to their documentation. The application expects the `VITE_CONVEX_URL` environment variable to be available at build time.
 
 ## CI/CD Setup
 

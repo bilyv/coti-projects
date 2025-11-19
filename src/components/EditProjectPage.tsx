@@ -46,6 +46,7 @@ export function EditProjectPage() {
   const [descriptionContent, setDescriptionContent] = useState("");
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
+  const [removedStepIds, setRemovedStepIds] = useState<Id<"steps">[]>([]); // Track removed step IDs
   const editorRef = useRef<HTMLDivElement>(null);
 
   const project = useQuery(api.projects.get, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
@@ -196,8 +197,16 @@ export function EditProjectPage() {
 
   const handleRemoveStep = (index: number) => {
     if (steps.length <= 1) return;
+    
+    const stepToRemove = steps[index];
     const newSteps = [...steps];
     newSteps.splice(index, 1);
+    
+    // If this is an existing step (has an _id), track it for removal
+    if (stepToRemove._id) {
+      setRemovedStepIds(prev => [...prev, stepToRemove._id!]);
+    }
+    
     setSteps(newSteps);
   };
 
@@ -248,133 +257,6 @@ export function EditProjectPage() {
     setSteps(newSteps);
   };
 
-  // Track which subtasks are being saved to prevent duplicate creations
-  const [savingSubtasks, setSavingSubtasks] = useState<Set<string>>(new Set());
-  // Track subtasks that need to be saved
-  const [pendingSubtasks, setPendingSubtasks] = useState<Record<string, { stepIndex: number; subtaskIndex: number; value: string }>>({});
-
-  // Add automatic saving for subtasks with debouncing
-  const autoSaveSubtask = (stepIndex: number, subtaskIndex: number, value: string) => {
-    // Update the subtask title in state
-    handleSubtaskChange(stepIndex, subtaskIndex, value);
-    
-    // Create a unique key for this subtask
-    const subtaskKey = `${stepIndex}-${subtaskIndex}`;
-    
-    // If this is an existing subtask with a title, update it immediately
-    const subtask = steps[stepIndex].subtasks[subtaskIndex];
-    if (subtask._id && value.trim()) {
-      // Set as pending to save
-      setPendingSubtasks(prev => ({
-        ...prev,
-        [subtaskKey]: { stepIndex, subtaskIndex, value }
-      }));
-    }
-    // If this is a new subtask (no _id) and has a title, mark it as pending creation
-    else if (!subtask._id && value.trim() && steps[stepIndex]._id) {
-      setPendingSubtasks(prev => ({
-        ...prev,
-        [subtaskKey]: { stepIndex, subtaskIndex, value }
-      }));
-    }
-    // If the value is empty and it's a new subtask, remove it from pending
-    else if (!subtask._id && !value.trim()) {
-      setPendingSubtasks(prev => {
-        const newPending = { ...prev };
-        delete newPending[subtaskKey];
-        return newPending;
-      });
-    }
-  };
-
-  // Save pending subtasks with debouncing
-  useEffect(() => {
-    if (Object.keys(pendingSubtasks).length === 0) return;
-
-    const timer = setTimeout(async () => {
-      await savePendingSubtasks();
-    }, 500); // Debounce for 500ms
-
-    return () => clearTimeout(timer);
-  }, [pendingSubtasks, savingSubtasks, steps, createSubtask, updateSubtask]);
-
-  // Function to immediately save pending subtasks
-  const savePendingSubtasks = async () => {
-    for (const [subtaskKey, { stepIndex, subtaskIndex, value }] of Object.entries(pendingSubtasks)) {
-      // If already saving this subtask, skip
-      if (savingSubtasks.has(subtaskKey)) {
-        continue;
-      }
-      
-      const subtask = steps[stepIndex].subtasks[subtaskIndex];
-      if (subtask._id && value.trim()) {
-        try {
-          setSavingSubtasks(prev => new Set(prev).add(subtaskKey));
-          await updateSubtask({
-            subtaskId: subtask._id,
-            title: value.trim(),
-            isCompleted: subtask.isCompleted
-          });
-          setSavingSubtasks(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(subtaskKey);
-            return newSet;
-          });
-        } catch (error) {
-          console.error("Error updating subtask:", error);
-          toast.error("Failed to update subtask");
-          setSavingSubtasks(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(subtaskKey);
-            return newSet;
-          });
-        }
-      }
-      // If this is a new subtask (no _id) and has a title, create it
-      else if (!subtask._id && value.trim() && steps[stepIndex]._id) {
-        try {
-          setSavingSubtasks(prev => new Set(prev).add(subtaskKey));
-          const newSubtaskId = await createSubtask({
-            stepId: steps[stepIndex]._id!,
-            title: value.trim()
-          });
-          
-          // Update the subtask with the new ID
-          const newSteps = [...steps];
-          newSteps[stepIndex].subtasks[subtaskIndex] = {
-            ...subtask,
-            _id: newSubtaskId,
-            title: value.trim()
-          };
-          setSteps(newSteps);
-          setSavingSubtasks(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(subtaskKey);
-            return newSet;
-          });
-        } catch (error) {
-          console.error("Error creating subtask:", error);
-          toast.error("Failed to create subtask");
-          setSavingSubtasks(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(subtaskKey);
-            return newSet;
-          });
-        }
-      }
-    }
-    
-    // Clear pending subtasks after saving
-    setPendingSubtasks({});
-  };
-
-  // Function to save immediately when needed (e.g., when submitting the form)
-  const saveAllPendingSubtasks = async () => {
-    if (Object.keys(pendingSubtasks).length > 0) {
-      await savePendingSubtasks();
-    }
-  };
-
   // Rich text editor functions
   const formatText = (command: string, value: string = '') => {
     document.execCommand(command, false, value);
@@ -408,9 +290,6 @@ export function EditProjectPage() {
     e.preventDefault();
     if (!name.trim() || !projectId) return;
 
-    // Save all pending subtasks before submitting
-    await saveAllPendingSubtasks();
-
     setIsSubmitting(true);
     try {
       // First update the project
@@ -422,30 +301,70 @@ export function EditProjectPage() {
         color: selectedColor,
       });
 
-      // Then update/create steps
-      for (const [index, step] of steps.entries()) {
+      // Remove steps that were deleted
+      for (const stepId of removedStepIds) {
+        try {
+          await removeStep({ stepId });
+        } catch (error) {
+          console.error("Error removing step:", error);
+          toast.error("Failed to remove a step");
+        }
+      }
+
+      // Process all steps and their subtasks
+      for (const [stepIndex, step] of steps.entries()) {
+        let stepId = step._id;
+        
+        // Update or create step
         if (step._id) {
-          // Update existing step
+          // Update existing step with order
           await updateStep({
             stepId: step._id,
             title: step.title.trim(),
             description: step.description.trim() || undefined,
+            order: step.order, // Include order in update
           });
         } else if (step.title.trim()) {
           // Create new step
-          const stepId = await createStep({
+          stepId = await createStep({
             projectId: projectId as Id<"projects">,
             title: step.title.trim(),
             description: step.description.trim() || undefined,
           });
+          
+          // Update the step in local state with the new ID
+          const newSteps = [...steps];
+          newSteps[stepIndex] = { ...step, _id: stepId };
+          setSteps(newSteps);
+        }
 
-          // Create subtasks for this new step
-          for (const subtask of step.subtasks) {
-            if (subtask.title.trim()) {
-              await createSubtask({
-                stepId,
-                title: subtask.title.trim(),
-              });
+        // Process subtasks for this step (only if step exists)
+        if (stepId) {
+          // Handle subtasks - update existing, create new, and ensure proper ordering
+          for (const [subtaskIndex, subtask] of step.subtasks.entries()) {
+            if (subtask._id && subtask.title.trim()) {
+              // Update existing subtask
+              try {
+                await updateSubtask({
+                  subtaskId: subtask._id,
+                  title: subtask.title.trim(),
+                  isCompleted: subtask.isCompleted,
+                });
+              } catch (error) {
+                console.error("Error updating subtask:", error);
+                toast.error("Failed to update subtask");
+              }
+            } else if (!subtask._id && subtask.title.trim()) {
+              // Create new subtask
+              try {
+                await createSubtask({
+                  stepId,
+                  title: subtask.title.trim(),
+                });
+              } catch (error) {
+                console.error("Error creating subtask:", error);
+                toast.error("Failed to create subtask");
+              }
             }
           }
         }
@@ -462,10 +381,38 @@ export function EditProjectPage() {
     }
   };
 
-  if (!project) {
+  if (!projectId) {
+    navigate("/");
+    return null;
+  }
+
+  if (project === undefined || projectSteps === undefined || allSubtasks === undefined) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-900 dark:to-dark-800">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (project === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-900 dark:to-dark-800">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">Project not found</h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">The project you're looking for doesn't exist or you don't have permission to edit it.</p>
+            <button
+              onClick={() => navigate("/")}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+            >
+              Back to Projects
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -667,22 +614,7 @@ export function EditProjectPage() {
                           <input
                             type="text"
                             value={subtask.title}
-                            onChange={(e) => autoSaveSubtask(index, subtaskIndex, e.target.value)}
-                            onBlur={() => {
-                              // Trigger immediate save when user leaves the field
-                              const subtaskKey = `${index}-${subtaskIndex}`;
-                              const pending = pendingSubtasks[subtaskKey];
-                              if (pending) {
-                                // Clear the pending subtask and trigger immediate save
-                                const timer = setTimeout(() => {
-                                  setPendingSubtasks(prev => {
-                                    const newPending = { ...prev };
-                                    delete newPending[subtaskKey];
-                                    return newPending;
-                                  });
-                                }, 0);
-                              }
-                            }}
+                            onChange={(e) => handleSubtaskChange(index, subtaskIndex, e.target.value)}
                             placeholder="Enter subtask"
                             className="flex-1 px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
                           />

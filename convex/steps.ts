@@ -173,6 +173,7 @@ export const update = mutation({
     stepId: v.id("steps"),
     title: v.string(),
     description: v.optional(v.string()),
+    order: v.optional(v.number()), // Add order parameter
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -188,10 +189,17 @@ export const update = mutation({
     }
 
     // Update the step
-    await ctx.db.patch(args.stepId, {
+    const updatedFields: any = {
       title: args.title,
       description: args.description,
-    });
+    };
+    
+    // Only update order if provided
+    if (args.order !== undefined) {
+      updatedFields.order = args.order;
+    }
+
+    await ctx.db.patch(args.stepId, updatedFields);
 
     return args.stepId;
   },
