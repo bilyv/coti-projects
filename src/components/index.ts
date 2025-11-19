@@ -7,4 +7,4 @@ export { CreateStepForm } from "./CreateStepForm";
 export { StepList } from "./StepList";
 export { ProjectModal } from "./ProjectModal";
 export { CreateProjectTab } from "./CreateProjectTab";
-export { EditProjectForm } from "./EditProjectForm";
+export { EditProjectPage } from "./EditProjectPage";

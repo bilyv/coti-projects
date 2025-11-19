@@ -157,3 +157,32 @@ export const remove = mutation({
     }
   },
 });
+
+export const update = mutation({
+  args: {
+    stepId: v.id("steps"),
+    title: v.string(),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const step = await ctx.db.get(args.stepId);
+    if (!step) throw new Error("Step not found");
+
+    // Verify user owns the project
+    const project = await ctx.db.get(step.projectId);
+    if (!project || project.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+
+    // Update the step
+    await ctx.db.patch(args.stepId, {
+      title: args.title,
+      description: args.description,
+    });
+
+    return args.stepId;
+  },
+});

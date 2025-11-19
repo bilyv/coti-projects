@@ -21,8 +21,6 @@ export function ProjectDetails() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const [showCreateStep, setShowCreateStep] = useState(false);
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
-  const [description, setDescription] = useState("");
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   
@@ -34,9 +32,6 @@ export function ProjectDetails() {
   useEffect(() => {
     if (projectId && project === null) {
       navigate("/");
-    }
-    if (project) {
-      setDescription(project.description || "");
     }
   }, [project, projectId, navigate]);
 
@@ -75,16 +70,6 @@ export function ProjectDetails() {
       </div>
     );
   }
-
-  const handleDescriptionSave = async () => {
-    if (projectId) {
-      await updateProject({
-        projectId: projectId as Id<"projects">,
-        description: description || undefined
-      });
-      setIsEditingDescription(false);
-    }
-  };
 
   // Truncate description for preview
   const truncateDescription = (text: string, maxLength: number = 200) => {
@@ -152,7 +137,7 @@ export function ProjectDetails() {
           </button>
           {/* Edit Project Button */}
           <button
-            onClick={() => navigate(`/edit-project/${projectId}`)}
+            onClick={() => navigate(`/project/${projectId}/edit`)}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -167,41 +152,7 @@ export function ProjectDetails() {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">{project.name}</h1>
-              {isEditingDescription ? (
-                <div className="mt-4">
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Add project description..."
-                    className="w-full p-4 border border-slate-300 rounded-xl dark:bg-dark-700 dark:border-dark-600 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    rows={4}
-                  />
-                  <div className="flex gap-3 mt-3">
-                    <button
-                      onClick={handleDescriptionSave}
-                      disabled={!description.trim()}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                        description.trim()
-                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
-                          : "bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-dark-600 dark:text-slate-400"
-                      }`}
-                    >
-                      Save Description
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDescription(project.description || "");
-                        setIsEditingDescription(false);
-                      }}
-                      className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-all dark:bg-dark-700 dark:text-slate-300 dark:hover:bg-dark-600"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                renderDescription()
-              )}
+              {renderDescription()}
             </div>
           </div>
 

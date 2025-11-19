@@ -126,3 +126,35 @@ export const remove = mutation({
     }
   },
 });
+
+export const update = mutation({
+  args: {
+    subtaskId: v.id("subtasks"),
+    title: v.string(),
+    isCompleted: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const subtask = await ctx.db.get(args.subtaskId);
+    if (!subtask) throw new Error("Subtask not found");
+
+    // Verify user owns the subtask's project
+    const step = await ctx.db.get(subtask.stepId);
+    if (!step) throw new Error("Step not found");
+
+    const project = await ctx.db.get(step.projectId);
+    if (!project || project.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+
+    // Update the subtask
+    await ctx.db.patch(args.subtaskId, {
+      title: args.title,
+      isCompleted: args.isCompleted,
+    });
+
+    return args.subtaskId;
+  },
+});
