@@ -37,6 +37,7 @@ export function CreateProjectTab() {
   const [descriptionContent, setDescriptionContent] = useState("");
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
+  const [isGeneratingSteps, setIsGeneratingSteps] = useState(false); // Add this state
   const editorRef = useRef<HTMLDivElement>(null);
 
   const createProject = useMutation(api.projects.create);
@@ -219,6 +220,42 @@ export function CreateProjectTab() {
     }
   };
 
+  // Add the AI step generation function
+  const handleGenerateStepsWithAI = async () => {
+    if (!name.trim()) {
+      toast.error("Please enter a project name first");
+      return;
+    }
+
+    setIsGeneratingSteps(true);
+    try {
+      // Import the AI service dynamically to avoid issues with Vite
+      const { generateProjectSteps } = await import("../lib/aiService");
+      
+      // Generate steps using AI
+      const aiSteps = await generateProjectSteps(name, description || "");
+      
+      // Convert AI steps to our format
+      const newSteps = aiSteps.map((aiStep) => ({
+        title: aiStep.title,
+        description: aiStep.description,
+        subtasks: aiStep.subtasks.map((subtask) => ({
+          title: subtask,
+          isCompleted: false,
+        })),
+      }));
+      
+      // Update the steps state
+      setSteps(newSteps);
+      toast.success(`Successfully generated ${newSteps.length} steps with AI!`);
+    } catch (error) {
+      console.error("Error generating steps with AI:", error);
+      toast.error(`Failed to generate steps: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setIsGeneratingSteps(false);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-4 mb-4 md:mb-0">
       <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Create New Project</h2>
@@ -306,7 +343,32 @@ export function CreateProjectTab() {
 
         {/* Steps Section */}
         <div className="border-t border-slate-200 dark:border-dark-700 pt-4">
-          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-3">Steps</h3>
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Steps</h3>
+            <button
+              type="button"
+              onClick={handleGenerateStepsWithAI}
+              disabled={!name.trim() || isGeneratingSteps}
+              className="px-3 py-1.5 text-sm bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:from-purple-600 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isGeneratingSteps ? (
+                <>
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  Steps with AI
+                </>
+              )}
+            </button>
+          </div>
           
           <div className="space-y-3 transition-all duration-300">
             {steps.map((step, index) => (
@@ -547,7 +609,7 @@ export function CreateProjectTab() {
                 title="Bullet List"
               >
                 <svg className="w-4 h-4 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
               

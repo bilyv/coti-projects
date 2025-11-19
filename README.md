@@ -12,6 +12,7 @@ The Coti Project Progress Tracker is a sophisticated task management application
 Key features include:
 - **Project Management**: Create, organize, and track multiple projects
 - **Sequential Steps**: Break down projects into ordered, manageable steps
+- **AI-Powered Step Generation**: Automatically generate project steps and subtasks using Gemini AI
 - **Progress Visualization**: Visual indicators showing completion status
 - **Responsive Design**: Works seamlessly across all devices
 - **Dark/Light Mode**: Toggle between themes based on user preference
@@ -25,6 +26,7 @@ Comprehensive documentation is available in the `docs` directory:
 - [API Reference](docs/API.md) - Detailed API endpoints and functions
 - [Deployment Guide](docs/DEPLOYMENT.md) - Instructions for deploying the application
 - [User Guide](docs/USER_GUIDE.md) - Instructions for using the application
+- [Gemini AI Setup](docs/GEMINI_AI_SETUP.md) - Instructions for setting up the AI feature
 
 ## 🏗️ Project Structure
 
@@ -40,6 +42,7 @@ coti-projects/
 │   │   ├── ProjectModal.tsx
 │   │   └── StepList.tsx
 │   ├── lib/                # Utility functions
+│   │   ├── aiService.ts      # AI service for Gemini integration
 │   │   └── utils.ts
 │   ├── App.tsx             # Main application component
 │   ├── RegisterForm.tsx    # User registration form
