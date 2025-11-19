@@ -22,14 +22,16 @@ interface Step {
 interface StepListProps {
   steps: Step[] | undefined;
   projectColor: string;
+  canModify: boolean;
 }
 
 // SubtaskList component to handle subtasks for each step
-function SubtaskList({ stepId }: { stepId: Id<"steps"> }) {
+function SubtaskList({ stepId, canModify }: { stepId: Id<"steps">; canModify: boolean }) {
   const subtasks = useQuery(api.subtasks.listByStep, { stepId }) || [];
   const toggleSubtaskComplete = useMutation(api.subtasks.toggleComplete);
 
   const handleToggleSubtaskComplete = async (subtaskId: Id<"subtasks">) => {
+    if (!canModify) return;
     try {
       await toggleSubtaskComplete({ subtaskId });
     } catch (error) {
@@ -47,11 +49,11 @@ function SubtaskList({ stepId }: { stepId: Id<"steps"> }) {
           <div key={subtask._id} className="flex items-center gap-2">
             <button
               onClick={() => handleToggleSubtaskComplete(subtask._id)}
-              className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center ${
-                subtask.isCompleted
+              disabled={!canModify}
+              className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${subtask.isCompleted
                   ? "bg-green-500 border-green-500"
                   : "border-slate-300 dark:border-slate-600"
-              }`}
+                } ${!canModify ? "cursor-default opacity-80" : "cursor-pointer"}`}
             >
               {subtask.isCompleted && (
                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,11 +61,10 @@ function SubtaskList({ stepId }: { stepId: Id<"steps"> }) {
                 </svg>
               )}
             </button>
-            <span className={`text-sm ${
-              subtask.isCompleted
+            <span className={`text-sm ${subtask.isCompleted
                 ? "text-green-700 line-through dark:text-green-400"
                 : "text-slate-700 dark:text-slate-300"
-            }`}>
+              }`}>
               {subtask.title}
             </span>
           </div>
@@ -73,11 +74,12 @@ function SubtaskList({ stepId }: { stepId: Id<"steps"> }) {
   );
 }
 
-export function StepList({ steps, projectColor }: StepListProps) {
+export function StepList({ steps, projectColor, canModify }: StepListProps) {
   const toggleComplete = useMutation(api.steps.toggleComplete);
   const removeStep = useMutation(api.steps.remove);
 
   const handleToggleComplete = async (stepId: Id<"steps">) => {
+    if (!canModify) return;
     try {
       await toggleComplete({ stepId });
     } catch (error) {
@@ -86,6 +88,7 @@ export function StepList({ steps, projectColor }: StepListProps) {
   };
 
   const handleRemoveStep = async (stepId: Id<"steps">) => {
+    if (!canModify) return;
     try {
       await removeStep({ stepId });
       toast.success("Step removed");
@@ -126,20 +129,19 @@ export function StepList({ steps, projectColor }: StepListProps) {
       {steps.map((step, index) => (
         <div
           key={step._id}
-          className={`relative rounded-xl border-2 transition-all duration-200 ${
-            step.isUnlocked
+          className={`relative rounded-xl border-2 transition-all duration-200 ${step.isUnlocked
               ? step.isCompleted
                 ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800/50"
                 : "bg-white border-slate-200 hover:border-slate-300 dark:bg-dark-800 dark:border-dark-700 dark:hover:border-dark-600"
               : "bg-slate-50 border-slate-200 opacity-60 dark:bg-dark-800/50 dark:border-dark-700"
-          }`}
+            }`}
         >
           <div className="p-4">
             <div className="flex items-start gap-4">
               {/* Step number/status */}
               <div className="flex-shrink-0 mt-1">
                 {step.isCompleted ? (
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
                     style={{ backgroundColor: projectColor }}
                   >
@@ -148,11 +150,11 @@ export function StepList({ steps, projectColor }: StepListProps) {
                     </svg>
                   </div>
                 ) : step.isUnlocked ? (
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-semibold dark:text-white"
-                    style={{ 
+                    style={{
                       borderColor: projectColor,
-                      color: projectColor 
+                      color: projectColor
                     }}
                   >
                     {index + 1}
@@ -168,41 +170,38 @@ export function StepList({ steps, projectColor }: StepListProps) {
 
               {/* Step content */}
               <div className="flex-1 min-w-0">
-                <h4 className={`font-medium mb-1 ${
-                  step.isCompleted 
-                    ? "text-green-800 line-through dark:text-green-400" 
-                    : step.isUnlocked 
-                      ? "text-slate-800 dark:text-slate-200" 
+                <h4 className={`font-medium mb-1 ${step.isCompleted
+                    ? "text-green-800 line-through dark:text-green-400"
+                    : step.isUnlocked
+                      ? "text-slate-800 dark:text-slate-200"
                       : "text-slate-500 dark:text-slate-500"
-                }`}>
+                  }`}>
                   {step.title}
                 </h4>
                 {step.description && (
-                  <p className={`text-sm ${
-                    step.isCompleted 
-                      ? "text-green-600 dark:text-green-500" 
-                      : step.isUnlocked 
-                        ? "text-slate-600 dark:text-slate-400" 
+                  <p className={`text-sm ${step.isCompleted
+                      ? "text-green-600 dark:text-green-500"
+                      : step.isUnlocked
+                        ? "text-slate-600 dark:text-slate-400"
                         : "text-slate-400 dark:text-slate-500"
-                  }`}>
+                    }`}>
                     {step.description}
                   </p>
                 )}
 
                 {/* Subtasks Section */}
-                <SubtaskList stepId={step._id} />
+                <SubtaskList stepId={step._id} canModify={canModify} />
               </div>
 
               {/* Actions */}
               <div className="flex items-center gap-2">
-                {step.isUnlocked && (
+                {step.isUnlocked && canModify && (
                   <button
                     onClick={() => handleToggleComplete(step._id)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                      step.isCompleted
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${step.isCompleted
                         ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
                         : "bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
-                    }`}
+                      }`}
                   >
                     {step.isCompleted ? "Undo" : "Mark as Done"}
                   </button>
@@ -213,10 +212,10 @@ export function StepList({ steps, projectColor }: StepListProps) {
 
           {/* Connection line to next step */}
           {index < steps.length - 1 && (
-            <div 
+            <div
               className="absolute left-8 top-12 w-0.5 h-6 -translate-x-0.5"
-              style={{ 
-                backgroundColor: step.isCompleted ? projectColor : "#e2e8f0" 
+              style={{
+                backgroundColor: step.isCompleted ? projectColor : "#e2e8f0"
               }}
             />
           )}

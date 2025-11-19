@@ -15,6 +15,8 @@ import type {
 } from "convex/server";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as invitations from "../invitations.js";
+import type * as projectMembers from "../projectMembers.js";
 import type * as projects from "../projects.js";
 import type * as router from "../router.js";
 import type * as steps from "../steps.js";
@@ -31,6 +33,8 @@ import type * as subtasks from "../subtasks.js";
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
+  invitations: typeof invitations;
+  projectMembers: typeof projectMembers;
   projects: typeof projects;
   router: typeof router;
   steps: typeof steps;

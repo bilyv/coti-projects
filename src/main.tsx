@@ -14,12 +14,12 @@ function getConvexUrl(): string {
   if (import.meta.env.PROD && import.meta.env.PROD_CONVEX_URL) {
     return import.meta.env.PROD_CONVEX_URL;
   }
-  
+
   // Use development URL in development mode
   if (import.meta.env.VITE_CONVEX_URL) {
     return import.meta.env.VITE_CONVEX_URL;
   }
-  
+
   // Provide a clear error message when neither environment variable is set
   if (import.meta.env.PROD) {
     throw new Error(
@@ -52,6 +52,10 @@ const router = createBrowserRouter([
   {
     path: "/project/:projectId/edit",
     element: <EditProjectPage />,
+  },
+  {
+    path: "/invite/:token",
+    element: <App />,
   },
 ]);
 

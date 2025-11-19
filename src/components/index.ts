@@ -8,3 +8,6 @@ export { StepList } from "./StepList";
 export { ProjectModal } from "./ProjectModal";
 export { CreateProjectTab } from "./CreateProjectTab";
 export { EditProjectPage } from "./EditProjectPage";
+export { InviteTeamModal } from "./InviteTeamModal";
+export { AcceptInviteModal } from "./AcceptInviteModal";
+export { TeamMembersList } from "./TeamMembersList";

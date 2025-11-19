@@ -15,6 +15,9 @@ interface Project {
   totalSteps: number;
   completedSteps: number;
   progress: number;
+  link?: string;
+  role: "owner" | "member";
+  permission?: "view" | "modify" | null;
 }
 
 export function ProjectDetails() {
@@ -23,10 +26,13 @@ export function ProjectDetails() {
   const [showCreateStep, setShowCreateStep] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
-  
+
   const project = useQuery(api.projects.get, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   const steps = useQuery(api.steps.listByProject, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   const updateProject = useMutation(api.projects.update);
+
+  // Check if user has modify permission
+  const canModify = project?.role === "owner" || project?.permission === "modify";
 
   // If projectId is invalid or project doesn't exist, redirect to home
   useEffect(() => {
@@ -99,12 +105,12 @@ export function ProjectDetails() {
     return (
       <div className="mt-2">
         {shouldTruncate ? (
-          <div 
+          <div
             className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap"
             dangerouslySetInnerHTML={{ __html: truncateDescription(project.description) }}
           />
         ) : (
-          <div 
+          <div
             className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap"
             dangerouslySetInnerHTML={{ __html: project.description }}
           />
@@ -130,9 +136,9 @@ export function ProjectDetails() {
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
         </svg>
-        <a 
-          href={project.link} 
-          target="_blank" 
+        <a
+          href={project.link}
+          target="_blank"
           rel="noopener noreferrer"
           className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium break-all"
         >
@@ -157,15 +163,17 @@ export function ProjectDetails() {
             <span>Back to Projects</span>
           </button>
           {/* Edit Project Button */}
-          <button
-            onClick={() => navigate(`/project/${projectId}/edit`)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
-            <span>Edit Project</span>
-          </button>
+          {canModify && (
+            <button
+              onClick={() => navigate(`/project/${projectId}/edit`)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+              <span>Edit Project</span>
+            </button>
+          )}
         </div>
 
         {/* Project Header */}
@@ -180,8 +188,8 @@ export function ProjectDetails() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <ProgressCircle 
-                progress={project.progress} 
+              <ProgressCircle
+                progress={project.progress}
                 size={80}
                 color={project.color}
               />
@@ -200,7 +208,7 @@ export function ProjectDetails() {
         {/* Steps Section */}
         <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Steps</h2>
-          
+
           {showCreateStep ? (
             <CreateStepForm
               projectId={project._id}
@@ -208,7 +216,7 @@ export function ProjectDetails() {
               onSuccess={() => setShowCreateStep(false)}
             />
           ) : steps && steps.length > 0 ? (
-            <StepList steps={steps} projectColor={project.color} />
+            <StepList steps={steps} projectColor={project.color} canModify={canModify} />
           ) : (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-dark-700">
@@ -218,15 +226,16 @@ export function ProjectDetails() {
               </div>
               <h3 className="text-lg font-medium text-slate-800 mb-2 dark:text-slate-200">No steps yet</h3>
               <p className="text-slate-600 dark:text-slate-400 mb-6">Add your first step to get started</p>
-              <button
-                onClick={() => setShowCreateStep(true)}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
-              >
-                Add First Step
-              </button>
+              {canModify && (
+                <button
+                  onClick={() => setShowCreateStep(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+                >
+                  Add First Step
+                </button>
+              )}
             </div>
           )}
-          
 
         </div>
       </div>
@@ -247,18 +256,18 @@ export function ProjectDetails() {
                 </svg>
               </button>
             </div>
-            
+
             {/* Modal Content with Scroll */}
             <div className="flex-1 overflow-y-auto p-4">
               <div className="prose max-w-none dark:prose-invert">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">{project.name}</h2>
-                <div 
+                <div
                   className="text-slate-600 dark:text-slate-300 prose prose-slate dark:prose-invert max-w-none"
                   dangerouslySetInnerHTML={{ __html: project.description || '' }}
                 />
               </div>
             </div>
-            
+
             {/* Modal Footer */}
             <div className="p-4 border-t border-slate-200 flex justify-end dark:border-dark-700">
               <button

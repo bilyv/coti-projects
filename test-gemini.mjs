@@ -1,26 +1,16 @@
 // Simple test script to verify Gemini API connectivity
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from 'fs';
+
+// Load environment variables
+import dotenv from 'dotenv';
+dotenv.config();
 
 async function testGemini() {
   try {
-    // Read .env.local file directly
-    let apiKey = '';
-    
-    if (fs.existsSync('.env.local')) {
-      const envContent = fs.readFileSync('.env.local', 'utf8');
-      const lines = envContent.split('\n');
-      
-      for (const line of lines) {
-        if (line.startsWith('VITE_GEMINI_API_KEY=')) {
-          apiKey = line.split('=')[1].trim();
-          break;
-        }
-      }
-    }
+    const apiKey = process.env.VITE_GEMINI_API_KEY;
     
     if (!apiKey) {
-      console.error("Gemini API key is not configured. Please set VITE_GEMINI_API_KEY in your .env.local file.");
+      console.error("Gemini API key is not configured. Please set VITE_GEMINI_API_KEY in your .env file.");
       return;
     }
 
@@ -29,33 +19,18 @@ async function testGemini() {
     // Initialize the Gemini AI client
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Try models that should be available based on our list
-    const modelNames = [
-      "gemini-pro-latest",
-      "gemini-flash-latest",
-      "gemini-2.0-flash",
-      "gemini-2.0-pro-exp"
-    ];
+    // Test with gemini-pro model
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     
-    for (const modelName of modelNames) {
-      try {
-        console.log(`\nTrying model: ${modelName}`);
-        const model = genAI.getGenerativeModel({ model: modelName });
-        
-        const prompt = "Say hello world";
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        
-        console.log(`Response from ${modelName}:`, text);
-        console.log(`✅ Successfully used model: ${modelName}`);
-        return; // Exit after first successful model
-      } catch (modelError) {
-        console.error(`❌ Error with model ${modelName}:`, modelError.message);
-      }
-    }
+    const prompt = "Say hello world";
     
-    console.log("❌ No models worked");
+    console.log("Sending test request...");
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    console.log("Response from Gemini API:", text);
+    console.log("✅ Gemini API is working correctly!");
   } catch (error) {
     console.error("❌ Error testing Gemini API:", error.message);
   }

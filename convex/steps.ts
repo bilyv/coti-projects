@@ -8,9 +8,21 @@ export const listByProject = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    // Verify user owns the project
+    // Verify user has access to the project (owner or member)
     const project = await ctx.db.get(args.projectId);
-    if (!project || project.userId !== userId) return [];
+    if (!project) return [];
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", args.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership) return [];
+    }
 
     return await ctx.db
       .query("steps")
@@ -30,10 +42,22 @@ export const create = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    // Verify user owns the project
+    // Verify user has modify permission
     const project = await ctx.db.get(args.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Project not found or unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", args.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to create steps");
+      }
     }
 
     // Get the next order number
@@ -41,7 +65,7 @@ export const create = mutation({
       .query("steps")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .collect();
-    
+
     const nextOrder = existingSteps.length;
     const isFirstStep = nextOrder === 0;
 
@@ -65,10 +89,22 @@ export const toggleComplete = mutation({
     const step = await ctx.db.get(args.stepId);
     if (!step) throw new Error("Step not found");
 
-    // Verify user owns the project
+    // Verify user has modify permission
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to toggle steps");
+      }
     }
 
     // Can only toggle if step is unlocked
@@ -77,7 +113,7 @@ export const toggleComplete = mutation({
     }
 
     const newCompletedState = !step.isCompleted;
-    
+
     // Update the step
     await ctx.db.patch(args.stepId, {
       isCompleted: newCompletedState,
@@ -87,7 +123,7 @@ export const toggleComplete = mutation({
     if (newCompletedState) {
       const nextStep = await ctx.db
         .query("steps")
-        .withIndex("by_project_and_order", (q) => 
+        .withIndex("by_project_and_order", (q) =>
           q.eq("projectId", step.projectId).eq("order", step.order + 1)
         )
         .unique();
@@ -125,10 +161,22 @@ export const remove = mutation({
     const step = await ctx.db.get(args.stepId);
     if (!step) throw new Error("Step not found");
 
-    // Verify user owns the project
+    // Verify user has modify permission
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to remove steps");
+      }
     }
 
     // Delete all subtasks associated with this step first
@@ -136,7 +184,7 @@ export const remove = mutation({
       .query("subtasks")
       .withIndex("by_step", (q) => q.eq("stepId", args.stepId))
       .collect();
-    
+
     for (const subtask of subtasks) {
       await ctx.db.delete(subtask._id);
     }
@@ -158,7 +206,7 @@ export const remove = mutation({
     for (let i = 0; i < remainingSteps.length; i++) {
       const currentStep = remainingSteps[i];
       const shouldBeUnlocked = i === 0 || remainingSteps[i - 1].isCompleted;
-      
+
       await ctx.db.patch(currentStep._id, {
         order: i,
         isUnlocked: shouldBeUnlocked,
@@ -182,10 +230,22 @@ export const update = mutation({
     const step = await ctx.db.get(args.stepId);
     if (!step) throw new Error("Step not found");
 
-    // Verify user owns the project
+    // Verify user has modify permission
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to update steps");
+      }
     }
 
     // Update the step
@@ -193,7 +253,7 @@ export const update = mutation({
       title: args.title,
       description: args.description,
     };
-    
+
     // Only update order if provided
     if (args.order !== undefined) {
       updatedFields.order = args.order;

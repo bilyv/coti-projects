@@ -53,9 +53,9 @@ export function EditProjectPage() {
   const projectSteps = useQuery(api.steps.listByProject, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   // Add a query to load all subtasks for all steps
   const allSubtasks = useQuery(
-    api.subtasks.listBySteps, 
-    projectId && projectSteps && projectSteps.length > 0 
-      ? { stepIds: projectSteps.map(step => step._id) } 
+    api.subtasks.listBySteps,
+    projectId && projectSteps && projectSteps.length > 0
+      ? { stepIds: projectSteps.map(step => step._id) }
       : "skip"
   );
   const updateProject = useMutation(api.projects.update);
@@ -90,7 +90,7 @@ export function EditProjectPage() {
         isCompleted: step.isCompleted,
         isUnlocked: step.isUnlocked
       })).sort((a, b) => a.order - b.order);
-      
+
       setSteps(stepsWithSubtasks);
     }
   }, [projectSteps]);
@@ -163,21 +163,21 @@ export function EditProjectPage() {
       setDropTargetIndex(null);
       return;
     }
-    
+
     const newSteps = [...steps];
     const draggedStep = newSteps[draggedIndex];
-    
+
     // Remove the dragged item
     newSteps.splice(draggedIndex, 1);
     // Insert it at the new position
     newSteps.splice(targetIndex, 0, draggedStep);
-    
+
     // Update order for all steps
     const updatedSteps = newSteps.map((step, index) => ({
       ...step,
       order: index
     }));
-    
+
     setSteps(updatedSteps);
     setDraggedIndex(null);
     setDropTargetIndex(null);
@@ -185,10 +185,10 @@ export function EditProjectPage() {
 
   const handleAddStep = () => {
     const newOrder = steps.length;
-    setSteps([...steps, { 
-      title: "", 
-      description: "", 
-      subtasks: [], 
+    setSteps([...steps, {
+      title: "",
+      description: "",
+      subtasks: [],
       order: newOrder,
       isCompleted: false,
       isUnlocked: newOrder === 0
@@ -197,16 +197,16 @@ export function EditProjectPage() {
 
   const handleRemoveStep = (index: number) => {
     if (steps.length <= 1) return;
-    
+
     const stepToRemove = steps[index];
     const newSteps = [...steps];
     newSteps.splice(index, 1);
-    
+
     // If this is an existing step (has an _id), track it for removal
     if (stepToRemove._id) {
       setRemovedStepIds(prev => [...prev, stepToRemove._id!]);
     }
-    
+
     setSteps(newSteps);
   };
 
@@ -229,8 +229,8 @@ export function EditProjectPage() {
   const handleAddSubtask = (stepIndex: number) => {
     const newSteps = [...steps];
     const newOrder = newSteps[stepIndex].subtasks.length;
-    newSteps[stepIndex].subtasks.push({ 
-      title: "", 
+    newSteps[stepIndex].subtasks.push({
+      title: "",
       isCompleted: false,
       order: newOrder
     });
@@ -239,7 +239,7 @@ export function EditProjectPage() {
 
   const handleRemoveSubtask = async (stepIndex: number, subtaskIndex: number) => {
     const subtask = steps[stepIndex].subtasks[subtaskIndex];
-    
+
     // If this is an existing subtask with an ID, delete it from the database
     if (subtask._id) {
       try {
@@ -250,7 +250,7 @@ export function EditProjectPage() {
         return; // Don't remove from local state if deletion failed
       }
     }
-    
+
     // Remove from local state
     const newSteps = [...steps];
     newSteps[stepIndex].subtasks.splice(subtaskIndex, 1);
@@ -314,7 +314,7 @@ export function EditProjectPage() {
       // Process all steps and their subtasks
       for (const [stepIndex, step] of steps.entries()) {
         let stepId = step._id;
-        
+
         // Update or create step
         if (step._id) {
           // Update existing step with order
@@ -331,7 +331,7 @@ export function EditProjectPage() {
             title: step.title.trim(),
             description: step.description.trim() || undefined,
           });
-          
+
           // Update the step in local state with the new ID
           const newSteps = [...steps];
           newSteps[stepIndex] = { ...step, _id: stepId };
@@ -428,7 +428,7 @@ export function EditProjectPage() {
           Cancel
         </button>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Project Name */}
         <div>
@@ -456,11 +456,10 @@ export function EditProjectPage() {
                 key={color}
                 type="button"
                 onClick={() => setSelectedColor(color)}
-                className={`w-8 h-8 rounded-lg transition-all ${
-                  selectedColor === color
+                className={`w-8 h-8 rounded-lg transition-all ${selectedColor === color
                     ? "ring-2 ring-offset-1 ring-slate-400 dark:ring-slate-500"
                     : "hover:scale-105"
-                }`}
+                  }`}
                 style={{ backgroundColor: color }}
                 aria-label={`Select color ${color}`}
               />
@@ -513,22 +512,20 @@ export function EditProjectPage() {
         {/* Steps Section */}
         <div className="border-t border-slate-200 dark:border-dark-700 pt-4">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-3">Steps</h3>
-          
+
           <div className="space-y-3 transition-all duration-300">
             {steps.map((step, index) => (
-              <div 
-                key={index} 
-                className={`border border-slate-200 dark:border-dark-700 rounded-lg p-3 transition-all duration-200 ease-in-out transform ${
-                  draggedIndex === index 
-                    ? "bg-blue-50 dark:bg-blue-900/20 opacity-50 scale-95 shadow-md" 
+              <div
+                key={index}
+                className={`border border-slate-200 dark:border-dark-700 rounded-lg p-3 transition-all duration-200 ease-in-out transform ${draggedIndex === index
+                    ? "bg-blue-50 dark:bg-blue-900/20 opacity-50 scale-95 shadow-md"
                     : dropTargetIndex === index && draggedIndex !== null
-                    ? "bg-blue-100 dark:bg-blue-900/30 scale-105 shadow-lg"
-                    : "bg-white dark:bg-dark-800"
-                } ${
-                  dropTargetIndex === index && draggedIndex !== null 
-                    ? "ring-2 ring-blue-500 ring-opacity-50" 
+                      ? "bg-blue-100 dark:bg-blue-900/30 scale-105 shadow-lg"
+                      : "bg-white dark:bg-dark-800"
+                  } ${dropTargetIndex === index && draggedIndex !== null
+                    ? "ring-2 ring-blue-500 ring-opacity-50"
                     : ""
-                }`}
+                  }`}
                 draggable
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
@@ -539,7 +536,7 @@ export function EditProjectPage() {
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-2">
                     {/* Drag Handle */}
-                    <div 
+                    <div
                       className="cursor-move p-1 rounded hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors"
                       draggable
                       onDragStart={(e) => {
@@ -566,7 +563,7 @@ export function EditProjectPage() {
                     </button>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1 dark:text-slate-400">
@@ -581,7 +578,7 @@ export function EditProjectPage() {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1 dark:text-slate-400">
                       Description (Optional)
@@ -594,7 +591,7 @@ export function EditProjectPage() {
                       className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-dark-800 dark:border-dark-700 dark:text-white dark:placeholder-slate-500"
                     />
                   </div>
-                  
+
                   {/* Subtasks Section */}
                   <div className="border-t border-slate-200 dark:border-dark-700 pt-2 mt-2">
                     <div className="flex justify-between items-center mb-2">
@@ -607,7 +604,7 @@ export function EditProjectPage() {
                         + Add Subtask
                       </button>
                     </div>
-                    
+
                     <div className="space-y-1">
                       {step.subtasks.map((subtask, subtaskIndex) => (
                         <div key={subtaskIndex} className="flex items-center gap-2">
@@ -635,7 +632,7 @@ export function EditProjectPage() {
               </div>
             ))}
           </div>
-          
+
           {/* Add Another Step Button */}
           <div className="mt-4 pt-4 border-t border-slate-200 dark:border-dark-700">
             <button
@@ -686,7 +683,7 @@ export function EditProjectPage() {
                 </svg>
               </button>
             </div>
-            
+
             {/* Editor Toolbar */}
             <div className="p-3 border-b border-slate-200 flex flex-wrap gap-1 dark:border-dark-700">
               <button
@@ -699,7 +696,7 @@ export function EditProjectPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h16M7 12h10m0 6H7" />
                 </svg>
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => formatText('italic')}
@@ -710,7 +707,7 @@ export function EditProjectPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M3 4h16" />
                 </svg>
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => formatText('underline')}
@@ -721,9 +718,9 @@ export function EditProjectPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
-              
+
               <div className="w-px bg-slate-300 mx-1 my-1 dark:bg-dark-600"></div>
-              
+
               <button
                 type="button"
                 onClick={() => formatText('formatBlock', '<h1>')}
@@ -732,7 +729,7 @@ export function EditProjectPage() {
               >
                 H1
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => formatText('formatBlock', '<h2>')}
@@ -741,7 +738,7 @@ export function EditProjectPage() {
               >
                 H2
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => formatText('formatBlock', '<h3>')}
@@ -750,9 +747,9 @@ export function EditProjectPage() {
               >
                 H3
               </button>
-              
+
               <div className="w-px bg-slate-300 mx-1 my-1 dark:bg-dark-600"></div>
-              
+
               <button
                 type="button"
                 onClick={() => formatText('insertUnorderedList')}
@@ -763,7 +760,7 @@ export function EditProjectPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => formatText('insertOrderedList')}
@@ -775,7 +772,7 @@ export function EditProjectPage() {
                 </svg>
               </button>
             </div>
-            
+
             {/* Editor Content */}
             <div className="flex-1 p-4 overflow-y-auto">
               <div
@@ -788,7 +785,7 @@ export function EditProjectPage() {
                 }}
               />
             </div>
-            
+
             {/* Modal Footer */}
             <div className="p-4 border-t border-slate-200 flex justify-end gap-3 dark:border-dark-700">
               <button

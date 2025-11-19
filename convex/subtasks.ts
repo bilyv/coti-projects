@@ -11,13 +11,25 @@ export const create = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    // Verify user owns the step's project
+    // Verify user has modify permission on the step's project
     const step = await ctx.db.get(args.stepId);
     if (!step) throw new Error("Step not found");
 
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to create subtasks");
+      }
     }
 
     // Get the next order number
@@ -25,7 +37,7 @@ export const create = mutation({
       .query("subtasks")
       .withIndex("by_step", (q) => q.eq("stepId", args.stepId))
       .collect();
-    
+
     const nextOrder = existingSubtasks.length;
 
     return await ctx.db.insert("subtasks", {
@@ -43,18 +55,30 @@ export const listByStep = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    // Verify user owns the step's project
+    // Verify user has access to the step's project (owner or member)
     const step = await ctx.db.get(args.stepId);
     if (!step) return [];
 
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) return [];
+    if (!project) return [];
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership) return [];
+    }
 
     const subtasks = await ctx.db
       .query("subtasks")
       .withIndex("by_step", (q) => q.eq("stepId", args.stepId))
       .collect();
-    
+
     return subtasks.sort((a, b) => a.order - b.order);
   },
 });
@@ -68,17 +92,29 @@ export const toggleComplete = mutation({
     const subtask = await ctx.db.get(args.subtaskId);
     if (!subtask) throw new Error("Subtask not found");
 
-    // Verify user owns the subtask's project
+    // Verify user has modify permission on the subtask's project
     const step = await ctx.db.get(subtask.stepId);
     if (!step) throw new Error("Step not found");
 
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to toggle subtasks");
+      }
     }
 
     const newCompletedState = !subtask.isCompleted;
-    
+
     await ctx.db.patch(args.subtaskId, {
       isCompleted: newCompletedState,
     });
@@ -96,13 +132,25 @@ export const remove = mutation({
     const subtask = await ctx.db.get(args.subtaskId);
     if (!subtask) throw new Error("Subtask not found");
 
-    // Verify user owns the subtask's project
+    // Verify user has modify permission on the subtask's project
     const step = await ctx.db.get(subtask.stepId);
     if (!step) throw new Error("Step not found");
 
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to remove subtasks");
+      }
     }
 
     // Get all subtasks in the step
@@ -140,13 +188,25 @@ export const update = mutation({
     const subtask = await ctx.db.get(args.subtaskId);
     if (!subtask) throw new Error("Subtask not found");
 
-    // Verify user owns the subtask's project
+    // Verify user has modify permission on the subtask's project
     const step = await ctx.db.get(subtask.stepId);
     if (!step) throw new Error("Step not found");
 
     const project = await ctx.db.get(step.projectId);
-    if (!project || project.userId !== userId) {
-      throw new Error("Unauthorized");
+    if (!project) throw new Error("Project not found");
+
+    const isOwner = project.userId === userId;
+    if (!isOwner) {
+      const membership = await ctx.db
+        .query("projectMembers")
+        .withIndex("by_project_and_user", (q) =>
+          q.eq("projectId", step.projectId).eq("userId", userId)
+        )
+        .unique();
+
+      if (!membership || membership.permission !== "modify") {
+        throw new Error("Unauthorized. You need modify permission to update subtasks");
+      }
     }
 
     // Update the subtask
@@ -168,11 +228,11 @@ export const listBySteps = query({
 
     // Verify user owns all the steps' projects
     const steps = await Promise.all(args.stepIds.map(stepId => ctx.db.get(stepId)));
-    
+
     // Check if all steps exist and belong to the same user
     for (const step of steps) {
       if (!step) return [];
-      
+
       const project = await ctx.db.get(step.projectId);
       if (!project || project.userId !== userId) return [];
     }
@@ -184,7 +244,7 @@ export const listBySteps = query({
         .query("subtasks")
         .withIndex("by_step", (q) => q.eq("stepId", stepId))
         .collect();
-      
+
       allSubtasks.push(...subtasks);
     }
 

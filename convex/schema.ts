@@ -20,7 +20,7 @@ const applicationTables = {
     isUnlocked: v.boolean(),
   }).index("by_project", ["projectId"])
     .index("by_project_and_order", ["projectId", "order"]),
-    
+
   subtasks: defineTable({
     stepId: v.id("steps"),
     title: v.string(),
@@ -28,6 +28,28 @@ const applicationTables = {
     order: v.number(),
   }).index("by_step", ["stepId"])
     .index("by_step_and_order", ["stepId", "order"]),
+
+  projectMembers: defineTable({
+    projectId: v.id("projects"),
+    userId: v.id("users"),
+    permission: v.string(), // "view" or "modify"
+    addedAt: v.number(),
+    addedBy: v.id("users"),
+  }).index("by_project", ["projectId"])
+    .index("by_user", ["userId"])
+    .index("by_project_and_user", ["projectId", "userId"]),
+
+  invitations: defineTable({
+    projectId: v.id("projects"),
+    invitedBy: v.id("users"),
+    permission: v.string(), // "view" or "modify"
+    token: v.string(),
+    expiresAt: v.number(),
+    status: v.string(), // "pending", "accepted", "declined", "expired"
+    acceptedBy: v.optional(v.id("users")),
+    acceptedAt: v.optional(v.number()),
+  }).index("by_token", ["token"])
+    .index("by_project", ["projectId"]),
 };
 
 export default defineSchema({

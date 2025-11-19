@@ -9,6 +9,7 @@ import { CreateProjectTab } from "./components/CreateProjectTab";
 import { useState, useEffect } from "react";
 import { RegisterForm } from "./RegisterForm";
 import { ProfilePage } from "./ProfilePage";
+import { InviteTeamModal, AcceptInviteModal, TeamMembersList } from "./components";
 
 export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -19,7 +20,7 @@ export default function App() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
       setTheme('dark');
       document.documentElement.classList.add('dark');
@@ -58,7 +59,7 @@ export default function App() {
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={toggleTheme}
                 className="p-2 rounded-lg bg-slate-100 dark:bg-dark-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors"
                 aria-label="Toggle theme"
@@ -73,10 +74,10 @@ export default function App() {
                   </svg>
                 )}
               </button>
-              
+
               {/* Profile Button */}
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="flex items-center gap-2 p-2 rounded-lg bg-slate-100 dark:bg-dark-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors"
                   aria-label="User profile"
@@ -88,14 +89,14 @@ export default function App() {
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </button>
-                
+
                 {/* Profile Dropdown Menu */}
                 {showProfileMenu && (
-                  <div 
+                  <div
                     className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-800 rounded-lg shadow-lg border border-slate-200 dark:border-dark-700 py-1 z-20"
                     onMouseLeave={() => setShowProfileMenu(false)}
                   >
-                    <button 
+                    <button
                       className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors"
                       onClick={() => {
                         setShowProfilePage(true);
@@ -120,12 +121,12 @@ export default function App() {
       <main className="max-w-6xl mx-auto px-4 py-8 pb-20 md:pb-8">
         <Content />
       </main>
-      
+
       {/* Profile Page Modal */}
       {showProfilePage && (
         <ProfilePage onClose={() => setShowProfilePage(false)} />
       )}
-      
+
       <Toaster position="top-right" />
     </div>
   );
@@ -135,6 +136,40 @@ function Content() {
   const loggedInUser = useQuery(api.auth.loggedInUser);
   const [authView, setAuthView] = useState<"signIn" | "signUp">("signIn");
   const [activeTab, setActiveTab] = useState<'overview' | 'team' | 'account' | 'create'>('overview');
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+
+  // Handle invite links from URL
+  useEffect(() => {
+    const path = window.location.pathname;
+    const inviteMatch = path.match(/\/invite\/([^/]+)/);
+
+    if (inviteMatch) {
+      const token = inviteMatch[1];
+
+      // If user is authenticated, show the modal
+      if (loggedInUser) {
+        setInviteToken(token);
+      } else {
+        // Store token for after authentication
+        sessionStorage.setItem('pendingInviteToken', token);
+      }
+
+      // Clean up URL
+      window.history.replaceState({}, '', '/');
+    }
+
+    // Check for pending invite after authentication
+    if (loggedInUser && !inviteToken) {
+      const pendingToken = sessionStorage.getItem('pendingInviteToken');
+      if (pendingToken) {
+        setInviteToken(pendingToken);
+        sessionStorage.removeItem('pendingInviteToken');
+      }
+    }
+  }, [loggedInUser, inviteToken]);
+
+  const projects = useQuery(api.projects.list);
 
   if (loggedInUser === undefined) {
     return (
@@ -185,7 +220,7 @@ function Content() {
                 </svg>
                 <span className="font-medium">Overview</span>
               </button>
-              
+
               <button
                 onClick={() => setActiveTab('create')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === 'create' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
@@ -195,17 +230,17 @@ function Content() {
                 </svg>
                 <span className="font-medium">Create</span>
               </button>
-              
+
               <button
                 onClick={() => setActiveTab('team')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === 'team' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
-                >
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span className="font-medium">Team</span>
               </button>
-              
+
               <button
                 onClick={() => setActiveTab('account')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === 'account' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
@@ -217,7 +252,7 @@ function Content() {
               </button>
             </div>
           </div>
-          
+
           {/* Mobile Bottom Navigation */}
           <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-800 border-t border-slate-200 dark:border-dark-700 flex justify-around py-2 z-20">
             <button
@@ -229,7 +264,7 @@ function Content() {
               </svg>
               <span className="text-xs">Overview</span>
             </button>
-            
+
             <button
               onClick={() => setActiveTab('create')}
               className={`flex flex-col items-center gap-1 px-4 py-2 ${activeTab === 'create' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}
@@ -239,7 +274,7 @@ function Content() {
               </svg>
               <span className="text-xs">Create</span>
             </button>
-            
+
             <button
               onClick={() => setActiveTab('team')}
               className={`flex flex-col items-center gap-1 px-4 py-2 ${activeTab === 'team' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}
@@ -249,7 +284,7 @@ function Content() {
               </svg>
               <span className="text-xs">Team</span>
             </button>
-            
+
             <button
               onClick={() => setActiveTab('account')}
               className={`flex flex-col items-center gap-1 px-4 py-2 ${activeTab === 'account' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}
@@ -260,7 +295,7 @@ function Content() {
               <span className="text-xs">Account</span>
             </button>
           </div>
-          
+
           {/* Main Content Area */}
           <div className="md:ml-64 flex-1 w-full mt-4 md:mt-0">
             {activeTab === 'overview' && (
@@ -275,33 +310,96 @@ function Content() {
                     </p>
                   </div>
                 </div>
-                
+
                 <ProjectList />
               </div>
             )}
-            
+
             {activeTab === 'create' && <CreateProjectTab />}
-            
+
             {activeTab === 'team' && (
-              <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Team Management</h2>
-                <div className="text-center py-12">
-                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Team Management</h2>
+                    <p className="text-slate-600 dark:text-slate-300 mt-1">
+                      Manage team members and collaborate on projects
+                    </p>
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">Team Collaboration</h3>
-                  <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-                    Collaborate with your team members on projects and track progress together.
-                  </p>
-                  <button className="mt-6 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all">
+                  <button
+                    onClick={() => setShowInviteModal(true)}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all flex items-center gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
                     Invite Team Members
                   </button>
                 </div>
+
+                {/* Projects with team members */}
+                <div className="space-y-6">
+                  {projects?.filter(p => p.role === "owner").map((project) => (
+                    <div key={project._id} className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                          style={{ backgroundColor: project.color }}
+                        >
+                          {project.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-slate-800 dark:text-slate-200">{project.name}</h3>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Your Project</p>
+                        </div>
+                      </div>
+                      <TeamMembersList projectId={project._id} isOwner={true} />
+                    </div>
+                  ))}
+
+                  {/* Projects where user is a member */}
+                  {projects && projects.filter(p => p.role === "member").length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Shared With You</h3>
+                      {projects?.filter(p => p.role === "member").map((project) => (
+                        <div key={project._id} className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 mb-4">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div
+                              className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                              style={{ backgroundColor: project.color }}
+                            >
+                              {project.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-slate-800 dark:text-slate-200">{project.name}</h3>
+                              <p className="text-sm text-slate-500 dark:text-slate-400">
+                                {project.permission === "modify" ? "Can Modify" : "View Only"}
+                              </p>
+                            </div>
+                          </div>
+                          <TeamMembersList projectId={project._id} isOwner={false} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {(!projects || projects.length === 0) && (
+                    <div className="text-center py-12">
+                      <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">No Projects Yet</h3>
+                      <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+                        Create a project to start collaborating with your team.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-            
+
             {activeTab === 'account' && (
               <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Account Settings</h2>
@@ -315,22 +413,22 @@ function Content() {
                       <p className="text-slate-600 dark:text-slate-400 text-sm">{loggedInUser?.email}</p>
                     </div>
                   </div>
-                  
+
                   <div className="border-t border-slate-200 dark:border-dark-700 pt-6">
                     <h4 className="font-medium text-slate-800 dark:text-slate-200 mb-4">Profile Information</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           defaultValue={loggedInUser?.name || ''}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
-                        <input 
-                          type="email" 
+                        <input
+                          type="email"
                           defaultValue={loggedInUser?.email || ''}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
                         />
@@ -346,6 +444,21 @@ function Content() {
           </div>
         </div>
 
+        {/* Modals */}
+        {showInviteModal && (
+          <InviteTeamModal onClose={() => setShowInviteModal(false)} />
+        )}
+
+        {inviteToken && loggedInUser && (
+          <AcceptInviteModal
+            invitationToken={inviteToken}
+            onClose={() => setInviteToken(null)}
+            onAccept={() => {
+              setInviteToken(null);
+              setActiveTab('team');
+            }}
+          />
+        )}
 
       </Authenticated>
     </div>

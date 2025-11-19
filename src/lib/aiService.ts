@@ -22,8 +22,8 @@ export async function generateProjectSteps(
     // Initialize the Gemini AI client
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Use the gemini-flash-latest model which we confirmed works
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    // Use the model name directly
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // Create the prompt for the AI
     const prompt = `You are a project management expert. Based on the project name and description, generate a list of steps to complete the project. Each step should have a title, description, and subtasks.
