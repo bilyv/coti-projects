@@ -27,6 +27,18 @@ export function ProjectDetails() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
+  // Initialize theme from localStorage or system preference (fix for dark mode inheritance)
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
   const project = useQuery(api.projects.get, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   const steps = useQuery(api.steps.listByProject, projectId ? { projectId: projectId as Id<"projects"> } : "skip");
   const updateProject = useMutation(api.projects.update);
@@ -162,18 +174,32 @@ export function ProjectDetails() {
             </svg>
             <span>Back to Projects</span>
           </button>
-          {/* Edit Project Button */}
-          {canModify && (
-            <button
-              onClick={() => navigate(`/project/${projectId}/edit`)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
-              <span>Edit Project</span>
-            </button>
-          )}
+          <div className="flex gap-2">
+            {/* Invite Button */}
+            {project.role === "owner" && (
+              <button
+                onClick={() => alert('Invite functionality to be implemented')}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+                <span>Invite</span>
+              </button>
+            )}
+            {/* Edit Project Button */}
+            {canModify && (
+              <button
+                onClick={() => navigate(`/project/${projectId}/edit`)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+                <span>Edit Project</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Project Header */}
