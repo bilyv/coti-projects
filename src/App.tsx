@@ -209,46 +209,46 @@ function Content() {
       <Authenticated>
         <div className="flex flex-col md:flex-row gap-6">
           {/* Beautiful Sidebar */}
-          <div className="hidden md:block md:fixed md:left-0 md:top-16 md:bottom-0 md:w-64 bg-white dark:bg-dark-800 rounded-xl md:rounded-none md:shadow-none border border-slate-200 dark:border-dark-700 md:border-0 p-4 md:p-6 h-fit md:h-[calc(100vh-4rem)] overflow-y-auto">
-            <div className="space-y-1">
+          <div className="hidden md:block md:fixed md:left-0 md:top-16 md:bottom-0 md:w-16 bg-white dark:bg-dark-800 rounded-xl md:rounded-none md:shadow-none border border-slate-200 dark:border-dark-700 md:border-0 p-2 h-fit md:h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="space-y-2 flex flex-col items-center py-4">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === 'overview' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${activeTab === 'overview' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                title="Overview"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                <span className="font-medium">Overview</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('create')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === 'create' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${activeTab === 'create' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                title="Create"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                <span className="font-medium">Create</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('team')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === 'team' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${activeTab === 'team' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                title="Team"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <span className="font-medium">Team</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('account')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === 'account' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${activeTab === 'account' ? 'bg-blue-50 dark:bg-dark-700 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-700'}`}
+                title="Account"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span className="font-medium">Account</span>
               </button>
             </div>
           </div>
@@ -297,7 +297,7 @@ function Content() {
           </div>
 
           {/* Main Content Area */}
-          <div className="md:ml-64 flex-1 w-full">
+          <div className="md:ml-16 flex-1 w-full">
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
