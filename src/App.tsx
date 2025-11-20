@@ -46,7 +46,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-900 dark:to-dark-800">
+    <div className="min-h-screen relative">
+      {/* Background grid pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] dark:bg-dark-900"></div>
+      
       <Authenticated>
         <header className="sticky top-0 z-10 bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm border-b border-slate-200 dark:border-dark-700 shadow-sm">
           <div className="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">

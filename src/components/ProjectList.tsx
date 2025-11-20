@@ -1,88 +1,9 @@
-import { useQuery, useMutation } from "convex/react";
-import { useState } from "react";
+import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { ProjectCard } from "./ProjectCard";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  rectSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-
-// Wrapper component for sortable project cards
-function SortableProjectCard({ project }: { project: any }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: project._id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 100 : 'auto',
-    opacity: isDragging ? 0.5 : 1,
-    cursor: 'grab',
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={isDragging ? "scale-105 rotate-3 shadow-lg" : ""}
-    >
-      <ProjectCard project={project} />
-    </div>
-  );
-}
 
 export function ProjectList() {
   const projects = useQuery(api.projects.list);
-  const [sortedProjects, setSortedProjects] = useState<any[]>([]);
-  const updateProjectOrder = useMutation(api.projects.updateOrder);
-
-  // Initialize sorted projects when data loads
-  useState(() => {
-    if (projects && projects.length > 0 && sortedProjects.length === 0) {
-      setSortedProjects([...projects]);
-    }
-  });
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor)
-  );
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = sortedProjects.findIndex((p) => p._id === active.id);
-      const newIndex = sortedProjects.findIndex((p) => p._id === over.id);
-      
-      const newSortedProjects = arrayMove(sortedProjects, oldIndex, newIndex);
-      setSortedProjects(newSortedProjects);
-      
-      // Update order in the backend
-      const projectIds = newSortedProjects.map(p => p._id);
-      await updateProjectOrder({ projectIds });
-    }
-  };
 
   if (projects === undefined) {
     return (
@@ -101,12 +22,7 @@ export function ProjectList() {
     );
   }
 
-  // Update sorted projects when projects change
-  if (projects && sortedProjects.length === 0) {
-    setSortedProjects([...projects]);
-  }
-
-  if (sortedProjects.length === 0) {
+  if (projects.length === 0) {
     return (
       <div className="text-center py-16">
         <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 dark:from-blue-900/30 dark:to-purple-900/30">
@@ -121,21 +37,10 @@ export function ProjectList() {
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={sortedProjects.map(p => p._id)}
-        strategy={rectSortingStrategy}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 md:mb-0">
-          {sortedProjects.map((project) => (
-            <SortableProjectCard key={project._id} project={project} />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 md:mb-0">
+      {projects.map((project) => (
+        <ProjectCard key={project._id} project={project} />
+      ))}
+    </div>
   );
 }

@@ -282,36 +282,3 @@ export const remove = mutation({
     await ctx.db.delete(args.projectId);
   },
 });
-
-export const updateOrder = mutation({
-  args: { projectIds: v.array(v.id("projects")) },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    // For simplicity, we're not actually storing the order in the database
-    // In a real application, you might want to add an 'order' field to projects
-    // and update it here. For now, we'll just validate that all projects
-    // belong to the user.
-    
-    for (const projectId of args.projectIds) {
-      const project = await ctx.db.get(projectId);
-      if (!project || (project.userId !== userId)) {
-        // Also check if user is a member with appropriate permissions
-        const membership = await ctx.db
-          .query("projectMembers")
-          .withIndex("by_project_and_user", (q) =>
-            q.eq("projectId", projectId).eq("userId", userId)
-          )
-          .unique();
-        
-        if (!membership) {
-          throw new Error("Project not found or unauthorized");
-        }
-      }
-    }
-
-    // Return success
-    return { success: true };
-  },
-});
