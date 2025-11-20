@@ -83,8 +83,23 @@ export const toggleComplete = mutation({
       isCompleted: newCompletedState,
     });
 
-    // If completing the step, unlock the next step
+    // If completing the step, mark all subtasks as completed and unlock the next step
     if (newCompletedState) {
+      // Mark all subtasks as completed
+      const subtasks = await ctx.db
+        .query("subtasks")
+        .withIndex("by_step", (q) => q.eq("stepId", args.stepId))
+        .collect();
+
+      for (const subtask of subtasks) {
+        if (!subtask.isCompleted) {
+          await ctx.db.patch(subtask._id, {
+            isCompleted: true,
+          });
+        }
+      }
+
+      // Unlock the next step
       const nextStep = await ctx.db
         .query("steps")
         .withIndex("by_project_and_order", (q) => 
