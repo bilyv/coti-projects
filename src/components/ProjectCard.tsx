@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { ProgressCircle } from "./ProgressCircle";
 import { Id } from "../../convex/_generated/dataModel";
@@ -45,6 +45,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
     return text.substring(0, maxLength) + "...";
   };
 
+  // Function to decode HTML entities
+  const decodeHtmlEntities = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+  };
+
   const handleDelete = async () => {
     await removeProject({ projectId: project._id });
     setShowDeleteConfirm(false);
@@ -65,8 +72,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
               {project.name}
             </h3>
             {project.description && (
-              <p className="text-slate-600 text-sm dark:text-slate-400" title={project.description}>
-                {truncateDescription(project.description, 100)}
+              <p className="text-slate-600 text-sm dark:text-slate-400" title={decodeHtmlEntities(project.description)}>
+                {decodeHtmlEntities(truncateDescription(project.description, 100))}
               </p>
             )}
           </div>
