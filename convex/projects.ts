@@ -54,12 +54,15 @@ export const list = query({
         const totalSteps = steps.length;
         const completedSteps = steps.filter(step => step.isCompleted).length;
         
-        // Calculate progress: 50% weight for steps, 50% weight for subtasks
+        // Calculate progress: steps are automatically completed when all subtasks are done,
+        // so we only need to count subtasks for progress if they exist, otherwise count steps
         let progress = 0;
-        if (totalSteps > 0 || totalSubtasks > 0) {
-          const stepProgress = totalSteps > 0 ? (completedSteps / totalSteps) : 0;
-          const subtaskProgress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) : 0;
-          progress = ((stepProgress + subtaskProgress) / 2) * 100;
+        if (totalSubtasks > 0) {
+          // If there are subtasks, progress is based on subtask completion
+          progress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0;
+        } else if (totalSteps > 0) {
+          // If there are no subtasks, progress is based on step completion
+          progress = (completedSteps / totalSteps) * 100;
         }
 
         return {
@@ -96,12 +99,15 @@ export const list = query({
         const totalSteps = steps.length;
         const completedSteps = steps.filter(step => step.isCompleted).length;
         
-        // Calculate progress: 50% weight for steps, 50% weight for subtasks
+        // Calculate progress: steps are automatically completed when all subtasks are done,
+        // so we only need to count subtasks for progress if they exist, otherwise count steps
         let progress = 0;
-        if (totalSteps > 0 || totalSubtasks > 0) {
-          const stepProgress = totalSteps > 0 ? (completedSteps / totalSteps) : 0;
-          const subtaskProgress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) : 0;
-          progress = ((stepProgress + subtaskProgress) / 2) * 100;
+        if (totalSubtasks > 0) {
+          // If there are subtasks, progress is based on subtask completion
+          progress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0;
+        } else if (totalSteps > 0) {
+          // If there are no subtasks, progress is based on step completion
+          progress = (completedSteps / totalSteps) * 100;
         }
 
         return {
@@ -170,12 +176,15 @@ export const get = query({
     const totalSteps = steps.length;
     const completedSteps = steps.filter(step => step.isCompleted).length;
     
-    // Calculate progress: 50% weight for steps, 50% weight for subtasks
+    // Calculate progress: steps are automatically completed when all subtasks are done,
+    // so we only need to count subtasks for progress if they exist, otherwise count steps
     let progress = 0;
-    if (totalSteps > 0 || totalSubtasks > 0) {
-      const stepProgress = totalSteps > 0 ? (completedSteps / totalSteps) : 0;
-      const subtaskProgress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) : 0;
-      progress = ((stepProgress + subtaskProgress) / 2) * 100;
+    if (totalSubtasks > 0) {
+      // If there are subtasks, progress is based on subtask completion
+      progress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0;
+    } else if (totalSteps > 0) {
+      // If there are no subtasks, progress is based on step completion
+      progress = (completedSteps / totalSteps) * 100;
     }
 
     return {
