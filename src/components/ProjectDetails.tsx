@@ -174,7 +174,28 @@ export function ProjectDetails() {
             </svg>
             <span>Back to Projects</span>
           </button>
-          <div className="flex gap-2">
+          {/* Edit Project Button */}
+          {canModify && (
+            <button
+              onClick={() => navigate(`/project/${projectId}/edit`)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+              <span>Edit Project</span>
+            </button>
+          )}
+        </div>
+
+        {/* Project Header */}
+        <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 mb-8">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">{project.name}</h1>
+              {renderDescription()}
+              {renderProjectLink()}
+            </div>
             {/* Invite Button */}
             {project.role === "owner" && (
               <button
@@ -187,29 +208,6 @@ export function ProjectDetails() {
                 <span>Invite</span>
               </button>
             )}
-            {/* Edit Project Button */}
-            {canModify && (
-              <button
-                onClick={() => navigate(`/project/${projectId}/edit`)}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-                <span>Edit Project</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Project Header */}
-        <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-sm border border-slate-200 dark:border-dark-700 p-6 mb-8">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">{project.name}</h1>
-              {renderDescription()}
-              {renderProjectLink()}
-            </div>
           </div>
 
           <div className="flex items-center justify-between">
