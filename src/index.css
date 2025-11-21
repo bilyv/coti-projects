@@ -4,11 +4,13 @@
 
 :root {
   --color-light: #ffffff;
-  --color-dark: #111111; /* Changed to dark gray */
+  --color-dark: #111111;
+  /* Changed to dark gray */
 }
 
 .dark {
-  --color-light: #111111;  /* Almost black dark gray */
+  --color-light: #111111;
+  /* Almost black dark gray */
   --color-dark: #ffffff;
 }
 
@@ -16,7 +18,21 @@
   @apply text-slate-600 dark:text-slate-400;
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
 body {
+  margin: 0;
+  padding: 0;
   font-family:
     "Inter Variable",
     ui-sans-serif,
