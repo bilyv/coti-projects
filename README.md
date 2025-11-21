@@ -1,13 +1,13 @@
-# Coti Project Progress Tracker
+# Cotim Project Progress Tracker
 
-![Project Screenshot](images/coti%20dashboard.jpg)
-![Steps Screenshot](images/coti%20steps.jpg)
+![Project Screenshot](images/cotim%20dashboard.jpg)
+![Steps Screenshot](images/cotim%20steps.jpg)
 
 A modern, full-stack web application for tracking project progress with sequential steps. Built with React, TypeScript, and Convex for a seamless serverless experience.
 
 ## 🌟 Project Overview
 
-The Coti Project Progress Tracker is a sophisticated task management application that helps users organize and monitor their projects through a structured step-by-step approach. With features like real-time progress tracking, dark/light mode toggle, and secure authentication, it provides an intuitive interface for managing complex workflows.
+The Cotim Project Progress Tracker is a sophisticated task management application that helps users organize and monitor their projects through a structured step-by-step approach. With features like real-time progress tracking, dark/light mode toggle, and secure authentication, it provides an intuitive interface for managing complex workflows.
 
 Key features include:
 - **Project Management**: Create, organize, and track multiple projects
@@ -31,7 +31,7 @@ Comprehensive documentation is available in the `docs` directory:
 ## 🏗️ Project Structure
 
 ```
-coti-projects/
+cotim-projects/
 ├── src/                    # Frontend source code
 │   ├── components/         # Reusable UI components
 │   │   ├── CreateProjectModal.tsx
@@ -91,8 +91,8 @@ coti-projects/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/bilyv/coti-projects.git
-   cd coti-projects
+   git clone https://github.com/bilyv/cotim-projects.git
+   cd cotim-projects
    ```
 
 2. Install dependencies:

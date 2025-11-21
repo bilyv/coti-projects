@@ -1,6 +1,6 @@
-# Coti Project Progress Tracker - Documentation
+# Cotim Project Progress Tracker - Documentation
 
-Welcome to the documentation for the Coti Project Progress Tracker, a modern SaaS application for tracking project progress with sequential steps.
+Welcome to the documentation for the Cotim Project Progress Tracker, a modern SaaS application for tracking project progress with sequential steps.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ Welcome to the documentation for the Coti Project Progress Tracker, a modern Saa
 
 ## Overview
 
-The Coti Project Progress Tracker is a full-stack web application that helps users organize and monitor their projects through a structured step-by-step approach. Built with React, TypeScript, and Convex, it provides a seamless serverless experience with real-time updates.
+The Cotim Project Progress Tracker is a full-stack web application that helps users organize and monitor their projects through a structured step-by-step approach. Built with React, TypeScript, and Convex, it provides a seamless serverless experience with real-time updates.
 
 ### Key Features
 

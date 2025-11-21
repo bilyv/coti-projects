@@ -1,6 +1,6 @@
 # User Guide
 
-This guide provides instructions for using the Coti Project Progress Tracker application.
+This guide provides instructions for using the Cotim Project Progress Tracker application.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This guide provides instructions for using the Coti Project Progress Tracker app
 
 ## Getting Started
 
-The Coti Project Progress Tracker helps you organize and track your projects through a structured step-by-step approach. Whether you're managing personal goals, work projects, or learning objectives, this tool provides an intuitive interface for breaking down complex tasks into manageable steps.
+The Cotim Project Progress Tracker helps you organize and track your projects through a structured step-by-step approach. Whether you're managing personal goals, work projects, or learning objectives, this tool provides an intuitive interface for breaking down complex tasks into manageable steps.
 
 ### Accessing the Application
 

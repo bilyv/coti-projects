@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide provides instructions for deploying the Coti Project Progress Tracker application.
+This guide provides instructions for deploying the Cotim Project Progress Tracker application.
 
 ## Table of Contents
 
@@ -26,8 +26,8 @@ Before deploying, ensure you have:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/bilyv/coti-projects.git
-   cd coti-projects
+   git clone https://github.com/bilyv/cotim-projects.git
+   cd cotim-projects
    ```
 
 2. Install dependencies:

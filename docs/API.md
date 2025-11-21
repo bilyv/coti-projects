@@ -1,6 +1,6 @@
 # API Documentation
 
-This document provides detailed information about the Coti Project Progress Tracker API endpoints and functions.
+This document provides detailed information about the Cotim Project Progress Tracker API endpoints and functions.
 
 ## Table of Contents
 

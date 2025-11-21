@@ -49,7 +49,7 @@ export default function App() {
     <div className="min-h-screen relative">
       {/* Background grid pattern */}
       <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] dark:bg-dark-900"></div>
-      
+
       <Authenticated>
         <header className="sticky top-0 z-10 bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm border-b border-slate-200 dark:border-dark-700 shadow-sm">
           <div className="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
@@ -58,7 +58,7 @@ export default function App() {
                 <span className="text-white font-bold text-sm">C</span>
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-400">
-                Coti
+                Cotim
               </h1>
             </div>
             <div className="flex items-center gap-4">
@@ -408,7 +408,7 @@ function Content() {
             {activeTab === 'account' && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Account Settings</h2>
-                
+
                 {/* Profile Card */}
                 <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
                   <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -442,7 +442,7 @@ function Content() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Profile Information */}
                 <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
                   <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg mb-4">Profile Information</h3>
@@ -492,7 +492,7 @@ function Content() {
                     Save Changes
                   </button>
                 </div>
-                
+
                 {/* Security Settings */}
                 <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
                   <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg mb-4">Security</h3>
@@ -506,7 +506,7 @@ function Content() {
                         Change Password
                       </button>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 dark:bg-dark-700 rounded-lg">
                       <div>
                         <h4 className="font-medium text-slate-800 dark:text-slate-200">Two-Factor Authentication</h4>
@@ -516,7 +516,7 @@ function Content() {
                         Enable 2FA
                       </button>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 dark:bg-dark-700 rounded-lg">
                       <div>
                         <h4 className="font-medium text-slate-800 dark:text-slate-200">Active Sessions</h4>
@@ -528,7 +528,7 @@ function Content() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Preferences */}
                 <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-slate-200 dark:border-dark-700 p-6">
                   <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg mb-4">Preferences</h3>
@@ -559,7 +559,7 @@ function Content() {
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 dark:bg-dark-700 rounded-lg">
                       <div>
                         <h4 className="font-medium text-slate-800 dark:text-slate-200">Email Notifications</h4>
