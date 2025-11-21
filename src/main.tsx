@@ -14,6 +14,11 @@ function getConvexUrl(): string {
   if (import.meta.env.PROD && import.meta.env.PROD_CONVEX_URL) {
     return import.meta.env.PROD_CONVEX_URL;
   }
+  
+  // Use VITE_CONVEX_URL in production as fallback
+  if (import.meta.env.PROD && import.meta.env.VITE_CONVEX_URL) {
+    return import.meta.env.VITE_CONVEX_URL;
+  }
 
   // Use development URL in development mode
   if (import.meta.env.VITE_CONVEX_URL) {
@@ -23,8 +28,8 @@ function getConvexUrl(): string {
   // Provide a clear error message when neither environment variable is set
   if (import.meta.env.PROD) {
     throw new Error(
-      "Missing PROD_CONVEX_URL environment variable. " +
-      "Please set PROD_CONVEX_URL in your environment variables for production builds."
+      "Missing PROD_CONVEX_URL or VITE_CONVEX_URL environment variable. " +
+      "Please set one of these environment variables for production builds."
     );
   } else {
     throw new Error(

@@ -11,6 +11,8 @@ export default defineConfig(({ mode }) => {
     define: {
       // Make the PROD_CONVEX_URL available in the client
       'import.meta.env.PROD_CONVEX_URL': JSON.stringify(env.PROD_CONVEX_URL),
+      // Make the VITE_CONVEX_URL available in the client
+      'import.meta.env.VITE_CONVEX_URL': JSON.stringify(env.VITE_CONVEX_URL),
     },
     plugins: [
       react(),
